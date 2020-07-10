@@ -1,0 +1,6 @@
+- hosts: primary
+  vars_files:
+    - 'setup_data.yml'
+  roles:
+    - { role: install-packages, tags: [ 'install-packages' ] }
+    - { role: install-NSO, tags: [ 'install-NSO' ] }

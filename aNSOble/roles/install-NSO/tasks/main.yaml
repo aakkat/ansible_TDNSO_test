@@ -1,0 +1,59 @@
+- name: Create NSO admin group
+  group:
+    name: ncsadmin
+    state: present
+
+- name: Adding to the ncsadmin group
+  user:
+    name: admin
+    groups: ncsadmin
+    append: yes
+
+- name: Download NSO install file (Remote copy)
+  get_url:
+    url: "{{ NSOImageLocation }}" 
+    dest: /tmp/NSO.bin
+    mode: '640'
+  when: NSOCopyType == 'remote'
+
+- name: Copy NSO install file (Local copy)
+  copy:
+    src: "{{ NSOImageLocation }}" 
+    dest: /tmp/NSO.bin
+    mode: '740'
+  become: true
+  when: NSOCopyType == 'local'
+
+- name: Unpack NSO install file
+  shell: sh /tmp/NSO.bin > /tmp/aNSOble.log
+  args:
+    chdir: /tmp/
+  become: true
+
+- name: Perfom NSO system install
+  shell: eval "/tmp/$(sed -e s/\ /\\n/g aNSOble.log | grep bin | tail -1) --system-install --non-interactive" >> /tmp/aNSOble.log
+  args:
+    chdir: /tmp/
+  become: true
+
+- name: Start NSO service
+  shell: |
+    source /etc/profile.d/ncs.sh
+    /etc/init.d/ncs start >> /tmp/aNSOble.log
+  become: true
+
+- name: Creating the default authgroup file from template
+  template:
+    src: authgroup.j2 
+    dest: /home/{{ ansible_user }}/authgroup.xml
+
+- name: Load default authgroup
+  shell: ncs_load -l -m authgroup.xml
+
+- name: Downloading NEDs from the earth repo
+  shell: wget -k --secure-protocol=TLSv1 -v --no-check-certificate --user {{ NEDsRepoUser }} --password {{ NEDsRepoPass }} https://earth.tail-f.com:8443/ncs-pkgs/{{ item.name }}/{{ item.targetNsoVersion }}/ncs-{{ item.targetNsoVersion }}-{{ item.name }}-{{ item.version }}.signed.bin >> /tmp/aNSOble.log
+  args:
+    chdir: /tmp/
+    warn: false
+  become: true
+  loop: "{{ NEDs }}"

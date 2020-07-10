@@ -1,0 +1,26 @@
+#Type of copy for the NSO install file, can be local or remote
+#NSOCopyType: remote
+NSOCopyType: local
+ 
+#URL/path from which the NSO install file should be downloaded
+#NSOImageLocation: http://www.ovh.net/files/1Mio.dat 
+NSOImageLocation: /Users/nfournie/Downloads/nso-5.2.2.3.linux.x86_64.signed.bin
+
+#NSO install type, can be system or local
+NSOInstallType: system
+
+#Default authgroup username and password
+DfltAuthUser: admin
+DfltAuthPass: cisco123
+
+#NEDs Repo Credentials
+NEDsRepoUser: as-ci-user.gen
+NEDsRepoPass: \!Manage123
+#NEDs to load
+NEDs:
+  - name: cisco-ios
+    version: 6.55
+    targetNsoVersion: 5.2.3
+  - name: cisco-iosxr
+    version: 7.29
+    targetNsoVersion: 5.2.3 
