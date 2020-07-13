@@ -54,10 +54,3 @@
   environment:
     PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
 
-- name: Downloading NEDs from the earth repo
-  shell: wget -k --secure-protocol=TLSv1 -v --no-check-certificate --user {{ NEDsRepoUser }} --password {{ NEDsRepoPass }} https://earth.tail-f.com:8443/ncs-pkgs/{{ item.name }}/{{ item.targetNsoVersion }}/ncs-{{ item.targetNsoVersion }}-{{ item.name }}-{{ item.version }}.signed.bin >> /tmp/aNSOble.log
-  args:
-    chdir: /tmp/
-    warn: false
-  become: true
-  loop: "{{ NEDs }}"

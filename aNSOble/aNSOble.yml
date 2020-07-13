@@ -1,6 +1,8 @@
 - hosts: primary
   vars_files:
     - 'setup_data.yml'
+    - 'setup_data_secure.yml'
   roles:
     - { role: install-packages, tags: [ 'install-packages' ] }
     - { role: install-NSO, tags: [ 'install-NSO' ] }
+    - { role: install-NEDs, tags: [ 'install-NEDs' ] }
