@@ -1,0 +1,5 @@
+- hosts: primary
+  vars_files:
+    - 'setup_data.yml'
+  roles:
+    - { role: uninstall-NSO, tags: [ 'uninstall-NSO' ] }

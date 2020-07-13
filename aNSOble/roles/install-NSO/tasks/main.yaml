@@ -2,12 +2,14 @@
   group:
     name: ncsadmin
     state: present
+  become: true
 
 - name: Adding to the ncsadmin group
   user:
-    name: admin
+    name: "{{ ansible_user }}" 
     groups: ncsadmin
     append: yes
+  become: true
 
 - name: Download NSO install file (Remote copy)
   get_url:
@@ -49,6 +51,8 @@
 
 - name: Load default authgroup
   shell: ncs_load -l -m authgroup.xml
+  environment:
+    PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
 
 - name: Downloading NEDs from the earth repo
   shell: wget -k --secure-protocol=TLSv1 -v --no-check-certificate --user {{ NEDsRepoUser }} --password {{ NEDsRepoPass }} https://earth.tail-f.com:8443/ncs-pkgs/{{ item.name }}/{{ item.targetNsoVersion }}/ncs-{{ item.targetNsoVersion }}-{{ item.name }}-{{ item.version }}.signed.bin >> /tmp/aNSOble.log

@@ -7,13 +7,13 @@
 
 - name: Installing python
   package:
-    name: python2 
+    name: "{{ 'python2' if ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' else 'python-minimal' }}" 
     state: present
   become: true
 
 - name: Installing java  
   package:
-    name: java 
+    name: "{{ 'java' if ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' else 'openjdk-8-jdk' }}" 
     state: present
   become: true
 
