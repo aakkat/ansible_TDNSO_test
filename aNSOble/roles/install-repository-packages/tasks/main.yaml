@@ -9,3 +9,11 @@
   args:
     chdir: /tmp/
     warn: false
+  become: true
+
+- name: Reloading NSO packages
+  shell: |
+    source /opt/ncs/current/ncsrc
+    echo 'packages reload' | ncs_cli -C
+  environment:
+    PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}  

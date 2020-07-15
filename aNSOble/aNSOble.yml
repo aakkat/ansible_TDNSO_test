@@ -3,7 +3,7 @@
     - 'setup_data.yml'
     - 'setup_data_secure.yml'
   roles:
-    #- { role: install-packages, tags: [ 'install-packages' ] }
-    #- { role: install-NSO, tags: [ 'install-NSO' ] }
-    #- { role: install-NEDs, tags: [ 'install-NEDs' ] }
-    - { role: get-repository, tags: [ 'get-repository' ] }
+    - { role: install-packages, tags: [ 'install-packages' ] }
+    - { role: install-NSO, tags: [ 'install-NSO' ] }
+    - { role: install-NEDs, tags: [ 'install-NEDs' ] }
+    - { role: install-repository-packages, tags: [ 'install-repository-packages' ] }
