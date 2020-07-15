@@ -1,0 +1,11 @@
+- name: Cloning the repository to /tmp directory
+  git:
+    repo: "https://{{GITUser}}:{{GITKeypass}}@{{RepositoryURL}}"
+    dest: /tmp/repo
+    force: yes
+
+- name: Copy NSO service packages to /var/opt/ncs/packages
+  shell: "cp -r repo/{{ServicePackagesPath}}/* /var/opt/ncs/packages"
+  args:
+    chdir: /tmp/
+    warn: false

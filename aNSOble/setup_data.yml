@@ -24,3 +24,7 @@ NEDs:
   - name: cisco-iosxr
     version: 7.29
     targetNsoVersion: 5.2.3 
+
+#Repository Data
+RepositoryURL: wwwin-github.cisco.com/AS-Customer/Ooredoo-Qatar-Ooredoo-Qatar-Automation.git
+ServicePackagesPath: packages
