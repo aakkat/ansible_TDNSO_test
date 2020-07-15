@@ -23,8 +23,13 @@ NEDs:
     targetNsoVersion: 5.2.3
   - name: cisco-iosxr
     version: 7.29
-    targetNsoVersion: 5.2.3
+    targetNsoVersion: 5.2.3 
 
+#Repository Data
+RepositoryURL: <GIT_PAGE>
+ServicePackagesPath: packages
+
+# HA Setup
 SetupHA: true
 TailfHCCVersion: 4.5.0
 TailfHCCNSOVersion: 5.2.3
@@ -37,4 +42,3 @@ VIPInterfaceSecondary: ens192
 HAToken: cisco123
 HAInterval: 4
 HAFailureLimit: 10
-
