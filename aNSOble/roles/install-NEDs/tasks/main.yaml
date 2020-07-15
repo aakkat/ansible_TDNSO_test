@@ -16,7 +16,7 @@
   become: true
   loop: "{{ NEDs }}"
 
-- name: Unpacking  NEDs into /var/opt/ncs/packages 
+- name: Unpacking NEDs into /var/opt/ncs/packages 
   shell: tar zxvf ncs-{{ item.targetNsoVersion }}-{{ item.name }}-{{ item.version }}.tar.gz -C /var/opt/ncs/packages >> /tmp/aNSOble.log
   args:
     chdir: /tmp/

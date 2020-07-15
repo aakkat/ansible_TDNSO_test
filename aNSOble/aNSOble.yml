@@ -1,4 +1,4 @@
-- hosts: primary
+- hosts: servers
   vars_files:
     - 'setup_data.yml'
     - 'setup_data_secure.yml'
@@ -7,3 +7,4 @@
     - { role: install-NSO, tags: [ 'install-NSO' ] }
     - { role: install-NEDs, tags: [ 'install-NEDs' ] }
     - { role: install-repository-packages, tags: [ 'install-repository-packages' ] }
+    - { role: setup-HA, tags: [ 'setup-HA' ] , when: SetupHA }

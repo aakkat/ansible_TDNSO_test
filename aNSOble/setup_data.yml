@@ -28,3 +28,17 @@ NEDs:
 #Repository Data
 RepositoryURL: <GIT_PAGE>
 ServicePackagesPath: packages
+
+# HA Setup
+SetupHA: true
+TailfHCCVersion: 4.5.0
+TailfHCCNSOVersion: 5.2.3
+PrimaryIP: 10.48.190.167
+SecondaryIP: 10.48.190.168
+VIP: 10.40.190.169
+VIPNetMask: 255.255.255.128
+VIPInterfacePrimary: ens192
+VIPInterfaceSecondary: ens192
+HAToken: cisco123
+HAInterval: 4
+HAFailureLimit: 10
