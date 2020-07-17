@@ -5,11 +5,19 @@
     force: yes
 
 - name: Copy NSO service packages to /var/opt/ncs/packages
-  shell: "cp -r repo/{{ServicePackagesPath}}/* /var/opt/ncs/packages"
+  copy:
+    src: /tmp/repo/{{ ServicePackagesPath }}/{{ item.name }}
+    dest: /var/opt/ncs/packages
+  become: true
+  loop: "{{ Packages }}"
+
+- name: Compiling the packages 
+  shell: make clean all -C {{ item.name }}/src/
   args:
-    chdir: /tmp/
+    chdir: /var/opt/ncs/packages/
     warn: false
   become: true
+  loop: "{{ Packages }}"
 
 - name: Reloading NSO packages
   shell: |
