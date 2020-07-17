@@ -1,4 +1,10 @@
 
+- name: Update apt cache
+  apt:
+    update-cache: true
+  when: ansible_pkg_mgr == 'apt'
+  become: true
+
 - name: Installing GIT
   package:
     name: git 
