@@ -41,6 +41,10 @@ ServicePackagesPath: packages
 Packages:
   - name: nico-interface-description-uppercase
     needsCompiling: false
+
+#Location of initial config to load on NSO
+NSOInitialConfigLocation: /tmp/initial.xml
+
 # HA Setup
 SetupHA: true
 TailfHCCVersion: 4.5.0

@@ -27,4 +27,18 @@
     source /opt/ncs/current/ncsrc
     echo 'packages reload' | ncs_cli -C
   environment:
-    PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}  
+    PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
+
+- name: Copy NSO initial config file
+  copy:
+    src: "{{ NSOInitialConfigLocation }}"
+    dest: /home/{{ ansible_user }}/initialConfig.xml
+    mode: '640'
+  become: true
+  when: NSOInitialConfigLocation is defined
+
+- name: Load initial config
+  shell: ncs_load -l -m initialConfig.xml
+  environment:
+    PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
+  when: NSOInitialConfigLocation is defined  
