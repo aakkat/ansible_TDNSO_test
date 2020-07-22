@@ -1,3 +1,9 @@
+#List of linux packages to install
+#This is a common base for Ubuntu:
+linuxPackages: ['git', 'make', 'python-minimal', 'openjdk-8-jdk', 'ant'] 
+#This is a common base for CentOS/RHEL:
+#linuxPackages: name: ['git', 'make', 'python2', 'java', 'ant'] 
+
 #Type of copy for the NSO install file, can be local or remote
 #NSOCopyType: remote
 NSOCopyType: local
