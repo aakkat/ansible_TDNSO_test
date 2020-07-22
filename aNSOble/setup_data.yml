@@ -26,12 +26,12 @@ NEDs:
     targetNsoVersion: 5.2.3 
 
 #Repository Data
-RepositoryURL: wwwin-github.cisco.com/AS-Customer/Ooredoo-Qatar-Ooredoo-Qatar-Automation.git
+RepositoryURL: wwwin-github.cisco.com/AS-Customer/Test-Nico-Interface-Project.git
+RepositoryBranch: master
 ServicePackagesPath: packages
 Packages:
-  - name: bbu-common
-  - name: bbu-direct
-
+  - name: nico-interface-description-uppercase
+    needsCompiling: false
 # HA Setup
 SetupHA: true
 TailfHCCVersion: 4.5.0

@@ -1,7 +1,8 @@
 - name: Cloning the repository to /tmp directory
   git:
-    repo: "https://{{GITUser}}:{{GITKeypass}}@{{RepositoryURL}}"
+    repo: "https://{{GITUser}}:{{GITKeyPass}}@{{RepositoryURL}}"
     dest: /tmp/repo
+    version: "{{ RepositoryBranch }}"
     force: yes
 
 - name: Copy NSO service packages to /var/opt/ncs/packages
@@ -18,6 +19,7 @@
     chdir: /var/opt/ncs/packages/
     warn: false
   become: true
+  when: item.needsCompiling 
   loop: "{{ Packages }}"
 
 - name: Reloading NSO packages

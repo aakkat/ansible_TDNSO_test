@@ -1,0 +1,12 @@
+#Server credentials and sudo password
+ansible_user: cisco
+ansible_password: cisco
+ansible_become_password: cisco
+
+#NEDs Repo Credentials
+NEDsRepoUser: <NEDsRepoUser>
+NEDsRepoPass: <NEDsRepoPass>
+
+#GIT User Access
+GITUser: <GITUser>
+GITKeyPass: <GITPass>

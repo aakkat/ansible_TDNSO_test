@@ -11,6 +11,12 @@
     state: present
   become: true
 
+- name: Installing make
+  package:
+    name: make 
+    state: present
+  become: true
+
 - name: Installing python
   package:
     name: "{{ 'python2' if ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' else 'python-minimal' }}" 
@@ -20,6 +26,12 @@
 - name: Installing java  
   package:
     name: "{{ 'java' if ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' else 'openjdk-8-jdk' }}" 
+    state: present
+  become: true
+
+- name: Installing ant
+  package:
+    name: ant
     state: present
   become: true
 
