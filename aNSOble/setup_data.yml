@@ -2,7 +2,7 @@
 #This is a common base for Ubuntu:
 linuxPackages: ['git', 'make', 'python-minimal', 'openjdk-8-jdk', 'ant'] 
 #This is a common base for CentOS/RHEL:
-#linuxPackages: name: ['git', 'make', 'python2', 'java', 'ant'] 
+#linuxPackages: ['git', 'make', 'python2', 'java', 'ant'] 
 
 #Type of copy for the NSO install file, can be local or remote
 #NSOCopyType: remote
@@ -15,13 +15,16 @@ NSOImageLocation: /Users/nfournie/Downloads/nso-5.2.2.3.linux.x86_64.signed.bin
 #NSO install type, can be system or local
 NSOInstallType: system
 
+#List of users to add to ncsadmin group
+ncsadminUsers: ['cisco']
+
+#List of users to add to the ncsoper group
+#ncsoperUsers: ['test']
+
 #Default authgroup username and password
 DfltAuthUser: admin
 DfltAuthPass: cisco123
 
-#NEDs Repo Credentials
-NEDsRepoUser: as-ci-user.gen
-NEDsRepoPass: \!Manage123
 #NEDs to load
 NEDs:
   - name: cisco-ios
