@@ -7,4 +7,5 @@
     - { role: install-NSO, tags: [ 'install-NSO' ] }
     - { role: install-NEDs, tags: [ 'install-NEDs' ] }
     - { role: install-repository-packages, tags: [ 'install-repository-packages' ] }
+    - { role: setup-netsim, tags: [ 'setup-netsim' ] , when: NetsimDevices is defined }
     - { role: setup-HA, tags: [ 'setup-HA' ] , when: SetupHA }

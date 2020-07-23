@@ -1,8 +1,8 @@
 #List of linux packages to install
 #This is a common base for Ubuntu:
-linuxPackages: ['git', 'make', 'python-minimal', 'openjdk-8-jdk', 'ant'] 
+linuxPackages: ['git', 'make', 'python-minimal', 'openjdk-8-jdk', 'ant', 'xsltproc'] 
 #This is a common base for CentOS/RHEL:
-#linuxPackages: ['git', 'make', 'python2', 'java', 'ant'] 
+#linuxPackages: ['git', 'make', 'python2', 'java', 'ant', 'xsltproc'] 
 
 #Type of copy for the NSO install file, can be local or remote
 #NSOCopyType: remote
@@ -23,7 +23,7 @@ ncsadminUsers: ['cisco']
 
 #Default authgroup username and password
 DfltAuthUser: admin
-DfltAuthPass: cisco123
+DfltAuthPass: admin 
 
 #NEDs to load
 NEDs:
@@ -41,6 +41,17 @@ ServicePackagesPath: packages
 Packages:
   - name: nico-interface-description-uppercase
     needsCompiling: false
+
+
+# Netsim setup
+NetsimDevices:
+  - name: cisco-ios-cli-6.55
+    numberofDevices: 2
+    deviceNamePrefix: ios-
+  - name: cisco-iosxr-cli-7.29
+    numberofDevices: 2
+    deviceNamePrefix: iosxr-
+
 
 #Location of initial config to load on NSO
 NSOInitialConfigLocation: /tmp/initial.xml
