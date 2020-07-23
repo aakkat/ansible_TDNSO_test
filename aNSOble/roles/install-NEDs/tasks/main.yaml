@@ -1,9 +1,8 @@
 - name: Downloading NEDs from the earth repo
-  shell: wget -k --secure-protocol=TLSv1 -v --no-check-certificate --user {{ NEDsRepoUser }} --password {{ NEDsRepoPass }} https://earth.tail-f.com:8443/ncs-pkgs/{{ item.name }}/{{ item.targetNsoVersion }}/ncs-{{ item.targetNsoVersion }}-{{ item.name }}-{{ item.version }}.signed.bin >> /tmp/aNSOble.log
+  shell: wget -k -O ncs-{{ item.targetNsoVersion }}-{{ item.name }}-{{ item.version }}.signed.bin --secure-protocol=TLSv1 -v --no-check-certificate --user {{ NEDsRepoUser }} --password {{ NEDsRepoPass }} https://earth.tail-f.com:8443/ncs-pkgs/{{ item.name }}/{{ item.targetNsoVersion }}/ncs-{{ item.targetNsoVersion }}-{{ item.name }}-{{ item.version }}.signed.bin >> /tmp/aNSOble.log
   args:
     chdir: /tmp/
     warn: false
-  become: true
   loop: "{{ NEDs }}"
 
 - name: Executing unpacking of signed NEDs 
@@ -13,7 +12,6 @@
   args:
     chdir: /tmp/
     warn: false
-  become: true
   loop: "{{ NEDs }}"
 
 - name: Unpacking NEDs into /var/opt/ncs/packages 
@@ -27,6 +25,6 @@
 - name: Reloading NSO packages
   shell: |
     source /opt/ncs/current/ncsrc
-    echo 'packages reload' | ncs_cli -C
+    echo 'packages reload' | ncs_cli -C >> /tmp/aNSOble.log
   environment:
     PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}    

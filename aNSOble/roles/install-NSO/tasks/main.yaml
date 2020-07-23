@@ -29,12 +29,18 @@
   when: ncsoperUsers is defined
   loop: " {{ ncsoperUsers }} "
 
+- name: Check if NSO is already installed
+  stat:
+    path: /opt/ncs/current/
+  become: true
+  register: ncs_current_dir
+
 - name: Download NSO install file (Remote copy)
   get_url:
     url: "{{ NSOImageLocation }}" 
     dest: /tmp/NSO.bin
     mode: '640'
-  when: NSOCopyType == 'remote'
+  when: NSOCopyType == 'remote' and ncs_current_dir.stat.exists == False
 
 - name: Copy NSO install file (Local copy)
   copy:
@@ -42,25 +48,59 @@
     dest: /tmp/NSO.bin
     mode: '740'
   become: true
-  when: NSOCopyType == 'local'
+  when: NSOCopyType == 'local' and ncs_current_dir.stat.exists == False
 
 - name: Unpack NSO install file
-  shell: sh /tmp/NSO.bin > /tmp/aNSOble.log
+  shell: sh /tmp/NSO.bin >> /tmp/aNSOble.log
   args:
     chdir: /tmp/
   become: true
+  when: ncs_current_dir.stat.exists == False
 
 - name: Perfom NSO system install
   shell: eval "/tmp/$(sed -e s/\ /\\n/g aNSOble.log | grep bin | tail -1) --system-install --non-interactive" >> /tmp/aNSOble.log
   args:
     chdir: /tmp/
   become: true
+  when: ncs_current_dir.stat.exists == False
+
+- name: Making sure /var/opt/ncs is accessible to all users
+  file:
+    path: /var/opt/ncs
+    state: directory
+    recurse: yes
+    mode: '0755'
+  become: yes
+  when: ncs_current_dir.stat.exists == False
+
+- name: Changing /var/opt/ncs/packages ownership to {{ ansible_user }} user
+  file:
+    path: /var/opt/ncs/packages
+    state: directory
+    recurse: yes
+    mode: '0755'
+    owner: "{{ ansible_user }}"
+    group: ncsadmin
+  become: yes
+  when: ncs_current_dir.stat.exists == False
+
+- name: Changing /opt/ncs ownership to {{ ansible_user }} user
+  file:
+    path: /opt/ncs
+    state: directory
+    recurse: yes
+    mode: '0755'
+    owner: "{{ ansible_user }}"
+    group: ncsadmin
+  become: yes
+  when: ncs_current_dir.stat.exists == False
 
 - name: Start NSO service
   shell: |
     source /etc/profile.d/ncs.sh
     /etc/init.d/ncs start >> /tmp/aNSOble.log
   become: true
+  when: ncs_current_dir.stat.exists == False
 
 - name: Creating the default authgroup file from template
   template:
@@ -68,7 +108,7 @@
     dest: /home/{{ ansible_user }}/authgroup.xml
 
 - name: Load default authgroup
-  shell: ncs_load -l -m authgroup.xml
+  shell: ncs_load -l -m authgroup.xml >> /tmp/aNSOble.log
   environment:
     PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
 

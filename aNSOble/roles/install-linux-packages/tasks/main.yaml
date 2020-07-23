@@ -1,3 +1,7 @@
+- name: Creating log file
+  file: 
+    path=/tmp/aNSOble.log 
+    state=touch
 
 - name: Update apt cache
   apt:
@@ -11,6 +15,7 @@
     state: present
   become: true
   loop: "{{ linuxPackages }}"
+  when: linuxPackages is defined
 
 - name: Setup default python version
   shell: alternatives --set python /usr/bin/python3

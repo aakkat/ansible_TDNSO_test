@@ -1,5 +1,14 @@
+- name: Stop and delete existing Netsim devices
+  shell: ncs-netsim delete-network >> /tmp/aNSOble.log 2>&1
+  environment:
+    PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
+    NCS_DIR: /opt/ncs/current
+  args:
+    chdir: /var/opt/ncs/packages/
+  ignore_errors: yes
+
 - name: Stop NSO
-  shell: ncs --stop >> aNSOble.log
+  shell: ncs --stop >> /tmp/aNSOble.log
   environment:
     PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
   ignore_errors: yes

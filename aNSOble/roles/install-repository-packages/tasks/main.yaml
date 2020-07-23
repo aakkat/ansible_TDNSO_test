@@ -1,4 +1,4 @@
-- name: Cloning the repository to /tmp directory
+- name: Cloning the {{ RepositoryBranch }} branch of the repository to /tmp/repo directory
   git:
     repo: "https://{{GITUser}}:{{GITKeyPass}}@{{RepositoryURL}}"
     dest: /tmp/repo
@@ -6,7 +6,7 @@
     force: yes
 
 - name: Copy NSO service packages to /var/opt/ncs/packages
-  shell: "cp -r repo/{{ ServicePackagesPath }}/{{ item.name }}/ /var/opt/ncs/packages/"
+  shell: "cp -r repo/{{ ServicePackagesPath }}/{{ item.name }}/ /var/opt/ncs/packages/ >> /tmp/aNSOble.log"
   args:
     chdir: /tmp/
     warn: false
@@ -14,7 +14,7 @@
   loop: "{{ Packages }}"
 
 - name: Compiling the packages 
-  shell: make clean all -C {{ item.name }}/src/
+  shell: make clean all -C {{ item.name }}/src/ >> /tmp/aNSOble.log
   args:
     chdir: /var/opt/ncs/packages/
     warn: false
@@ -25,7 +25,7 @@
 - name: Reloading NSO packages
   shell: |
     source /opt/ncs/current/ncsrc
-    echo 'packages reload' | ncs_cli -C
+    echo 'packages reload' | ncs_cli -C >> /tmp/aNSOble.log
   environment:
     PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
 
@@ -38,7 +38,7 @@
   when: NSOInitialConfigLocation is defined
 
 - name: Load initial config
-  shell: ncs_load -l -m initialConfig.xml
+  shell: ncs_load -l -m initialConfig.xml >> /tmp/aNSOble.log
   environment:
     PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
   when: NSOInitialConfigLocation is defined  

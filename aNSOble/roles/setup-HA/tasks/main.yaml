@@ -4,7 +4,6 @@
   args:
     chdir: /tmp/
     warn: false
-  become: true
 
 - name: Executing unpacking of signed Tailf-HCC-Project
   shell: |
@@ -13,14 +12,12 @@
   args:
     chdir: /tmp/
     warn: false
-  become: true
 
 - name: Unpacking Tailf-HCC-Project into /tmp
   shell: tar zxvf ncs-{{ TailfHCCNSOVersion }}-tailf-hcc-project-{{ TailfHCCVersion }}.tar.gz -C /tmp >> /tmp/aNSOble.log
   args:
     chdir: /tmp/
     warn: false
-  become: true
 
 - name: Unpacking Tailf-HCC  into /var/opt/ncs/packages
   shell: tar zxvf ncs-{{ TailfHCCNSOVersion }}-tailf-hcc-{{ TailfHCCVersion }}.tar.gz -C /var/opt/ncs/packages >> /tmp/aNSOble.log
@@ -32,7 +29,7 @@
 - name: Reloading NSO packages
   shell: |
     source /opt/ncs/current/ncsrc
-    echo 'packages reload' | ncs_cli -C
+    echo 'packages reload' | ncs_cli -C >> /tmp/aNSOble.log
   environment:
     PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
 
@@ -45,7 +42,7 @@
       secondary {{ SecondaryIP }}
   become: true
 
-- name: Setup of HA as Enable in /etc/ncs/ncs.conf 
+- name: Setup of HA as Enabled in /etc/ncs/ncs.conf 
   blockinfile:
     path: /etc/ncs/ncs.conf
     marker: "<!-- {mark} Added by ansible (setting up hosts) -->"
@@ -68,13 +65,13 @@
     dest: /home/{{ ansible_user }}/ha.xml
 
 - name: Loading HA config
-  shell: ncs_load -l -m ha.xml
+  shell: ncs_load -l -m ha.xmli >> /tmp/aNSOble.log
   environment:
     PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
 
 - name: Activating HA
   shell: |
     source /opt/ncs/current/ncsrc
-    echo 'request ha commands activate' | ncs_cli 
+    echo 'request ha commands activate' | ncs_cli >> /tmp/aNSOble.log 
   environment:
     PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}  

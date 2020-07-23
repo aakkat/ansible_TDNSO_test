@@ -54,7 +54,7 @@ NetsimDevices:
 
 
 #Location of initial config to load on NSO
-NSOInitialConfigLocation: /tmp/initial.xml
+#NSOInitialConfigLocation: /tmp/initial.xml
 
 # HA Setup
 SetupHA: true
