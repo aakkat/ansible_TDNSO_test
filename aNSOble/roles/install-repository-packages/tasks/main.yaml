@@ -6,15 +6,14 @@
     force: yes
 
 - name: Copy NSO service packages to /var/opt/ncs/packages
-  shell: "cp -r repo/{{ ServicePackagesPath }}/{{ item.name }}/ /var/opt/ncs/packages/ >> /tmp/aNSOble.log"
+  shell: cp -r repo/{{ ServicePackagesPath }}/{{ item.name }}/ /var/opt/ncs/packages/ >> /tmp/aNSOble.log 2>&1
   args:
     chdir: /tmp/
     warn: false
-  become: true
   loop: "{{ Packages }}"
 
 - name: Compiling the packages 
-  shell: make clean all -C {{ item.name }}/src/ >> /tmp/aNSOble.log
+  shell: make clean all -C {{ item.name }}/src/ >> /tmp/aNSOble.log 2>&1
   args:
     chdir: /var/opt/ncs/packages/
     warn: false
@@ -25,7 +24,7 @@
 - name: Reloading NSO packages
   shell: |
     source /opt/ncs/current/ncsrc
-    echo 'packages reload' | ncs_cli -C >> /tmp/aNSOble.log
+    echo 'packages reload' | ncs_cli -C >> /tmp/aNSOble.log 2>&1
   environment:
     PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
 
@@ -34,11 +33,10 @@
     src: "{{ NSOInitialConfigLocation }}"
     dest: /home/{{ ansible_user }}/initialConfig.xml
     mode: '640'
-  become: true
   when: NSOInitialConfigLocation is defined
 
 - name: Load initial config
-  shell: ncs_load -l -m initialConfig.xml >> /tmp/aNSOble.log
+  shell: ncs_load -l -m initialConfig.xml >> /tmp/aNSOble.log 2>&1
   environment:
     PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
   when: NSOInitialConfigLocation is defined  

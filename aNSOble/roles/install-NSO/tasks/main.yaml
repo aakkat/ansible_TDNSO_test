@@ -47,18 +47,16 @@
     src: "{{ NSOImageLocation }}" 
     dest: /tmp/NSO.bin
     mode: '740'
-  become: true
   when: NSOCopyType == 'local' and ncs_current_dir.stat.exists == False
 
 - name: Unpack NSO install file
-  shell: sh /tmp/NSO.bin >> /tmp/aNSOble.log
+  shell: sh /tmp/NSO.bin >> /tmp/aNSOble.log 2>&1
   args:
     chdir: /tmp/
-  become: true
   when: ncs_current_dir.stat.exists == False
 
 - name: Perfom NSO system install
-  shell: eval "/tmp/$(sed -e s/\ /\\n/g aNSOble.log | grep bin | tail -1) --system-install --non-interactive" >> /tmp/aNSOble.log
+  shell: eval "/tmp/$(sed -e s/\ /\\n/g aNSOble.log | grep bin | tail -1) --system-install --non-interactive" >> /tmp/aNSOble.log 2>&1
   args:
     chdir: /tmp/
   become: true
@@ -98,7 +96,7 @@
 - name: Start NSO service
   shell: |
     source /etc/profile.d/ncs.sh
-    /etc/init.d/ncs start >> /tmp/aNSOble.log
+    /etc/init.d/ncs start >> /tmp/aNSOble.log 2>&1
   become: true
   when: ncs_current_dir.stat.exists == False
 
@@ -108,7 +106,7 @@
     dest: /home/{{ ansible_user }}/authgroup.xml
 
 - name: Load default authgroup
-  shell: ncs_load -l -m authgroup.xml >> /tmp/aNSOble.log
+  shell: ncs_load -l -m authgroup.xml >> /tmp/aNSOble.log 2>&1
   environment:
     PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
 

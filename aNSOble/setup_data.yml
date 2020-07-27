@@ -10,7 +10,7 @@ NSOCopyType: local
  
 #URL/path from which the NSO install file should be downloaded
 #NSOImageLocation: http://www.ovh.net/files/1Mio.dat 
-NSOImageLocation: /Users/nfournie/Downloads/nso-5.2.2.3.linux.x86_64.signed.bin
+NSOImageLocation: /Users/nfournie/Downloads/nso-5.3.2.2.linux.x86_64.signed.bin
 
 #NSO install type, can be system or local
 NSOInstallType: system
@@ -29,10 +29,16 @@ DfltAuthPass: admin
 NEDs:
   - name: cisco-ios
     version: 6.55
-    targetNsoVersion: 5.2.3
+    targetNsoVersion: 5.3.2
   - name: cisco-iosxr
     version: 7.29
-    targetNsoVersion: 5.2.3 
+    targetNsoVersion: 5.3.2 
+  - name: cisco-asa
+    version: 6.10.2
+    targetNsoVersion: 5.3.2
+  - name: resource-manager-project
+    version: 3.4.5
+    targetNsoVersion: 5.3.2
 
 #Repository Data
 RepositoryURL: wwwin-github.cisco.com/AS-Customer/Test-Nico-Interface-Project.git
@@ -43,7 +49,7 @@ Packages:
     needsCompiling: false
 
 
-# Netsim setup
+#Netsim setup
 NetsimDevices:
   - name: cisco-ios-cli-6.55
     numberofDevices: 2
@@ -51,7 +57,8 @@ NetsimDevices:
   - name: cisco-iosxr-cli-7.29
     numberofDevices: 2
     deviceNamePrefix: iosxr-
-
+#Directory Netsim should be run
+NetsimDir: /var/opt/ncs/packages/ 
 
 #Location of initial config to load on NSO
 #NSOInitialConfigLocation: /tmp/initial.xml
@@ -59,7 +66,7 @@ NetsimDevices:
 # HA Setup
 SetupHA: true
 TailfHCCVersion: 4.5.0
-TailfHCCNSOVersion: 5.2.3
+TailfHCCNSOVersion: 5.3.2
 PrimaryIP: 10.48.190.167
 SecondaryIP: 10.48.190.168
 VIP: 10.40.190.169

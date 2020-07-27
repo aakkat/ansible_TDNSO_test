@@ -1,5 +1,5 @@
 - name: Downloading NEDs from the earth repo
-  shell: wget -k -O ncs-{{ item.targetNsoVersion }}-{{ item.name }}-{{ item.version }}.signed.bin --secure-protocol=TLSv1 -v --no-check-certificate --user {{ NEDsRepoUser }} --password {{ NEDsRepoPass }} https://earth.tail-f.com:8443/ncs-pkgs/{{ item.name }}/{{ item.targetNsoVersion }}/ncs-{{ item.targetNsoVersion }}-{{ item.name }}-{{ item.version }}.signed.bin >> /tmp/aNSOble.log
+  shell: wget -k -O ncs-{{ item.targetNsoVersion }}-{{ item.name }}-{{ item.version }}.signed.bin --secure-protocol=TLSv1 -v --no-check-certificate --user {{ NEDsRepoUser }} --password {{ NEDsRepoPass }} https://earth.tail-f.com:8443/ncs-pkgs/{{ item.name }}/{{ item.targetNsoVersion }}/ncs-{{ item.targetNsoVersion }}-{{ item.name }}-{{ item.version }}.signed.bin >> /tmp/aNSOble.log 2>&1
   args:
     chdir: /tmp/
     warn: false
@@ -7,24 +7,33 @@
 
 - name: Executing unpacking of signed NEDs 
   shell: |
-    chmod 0755 ./ncs-{{ item.targetNsoVersion }}-{{ item.name }}-{{ item.version }}.signed.bin >> /tmp/aNSOble.log
-    ./ncs-{{ item.targetNsoVersion }}-{{ item.name }}-{{ item.version }}.signed.bin >> /tmp/aNSOble.log
+    chmod 0755 ./ncs-{{ item.targetNsoVersion }}-{{ item.name }}-{{ item.version }}.signed.bin >> /tmp/aNSOble.log 2>&1
+    ./ncs-{{ item.targetNsoVersion }}-{{ item.name }}-{{ item.version }}.signed.bin >> /tmp/aNSOble.log 2>&1
   args:
     chdir: /tmp/
     warn: false
   loop: "{{ NEDs }}"
 
 - name: Unpacking NEDs into /var/opt/ncs/packages 
-  shell: tar zxvf ncs-{{ item.targetNsoVersion }}-{{ item.name }}-{{ item.version }}.tar.gz -C /var/opt/ncs/packages >> /tmp/aNSOble.log
+  shell: tar zxvf ncs-{{ item.targetNsoVersion }}-{{ item.name }}-{{ item.version }}.tar.gz -C /var/opt/ncs/packages >> /tmp/aNSOble.log 2>&1
   args:
     chdir: /tmp/
     warn: false
-  become: true
+  loop: "{{ NEDs }}"
+
+- name: Resource manager special handling
+  shell: |
+    tar zxvf ./ncs-{{ item.targetNsoVersion }}-{{ item.name }}-{{ item.version }}/packages/ncs-{{ item.targetNsoVersion }}-resource-manager-{{ item.version }}.tar.gz -C /var/opt/ncs/packages
+    rm -r ncs-{{ item.targetNsoVersion }}-{{ item.name }}-{{ item.version }} 
+  args:
+    chdir: /var/opt/ncs/packages/
+    warn: false
+  when: item.name == 'resource-manager-project' 
   loop: "{{ NEDs }}"
 
 - name: Reloading NSO packages
   shell: |
     source /opt/ncs/current/ncsrc
-    echo 'packages reload' | ncs_cli -C >> /tmp/aNSOble.log
+    echo 'packages reload' | ncs_cli -C >> /tmp/aNSOble.log 2>&1
   environment:
     PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}    
