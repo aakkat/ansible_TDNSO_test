@@ -4,8 +4,8 @@
     - 'setup_data_secure.yml'
   roles:
     - { role: install-linux-packages, tags: [ 'install-linux-packages' ] }
-    - { role: install-NSO, tags: [ 'install-NSO' ] }
-    - { role: install-NEDs, tags: [ 'install-NEDs' ] }
-    - { role: install-repository-packages, tags: [ 'install-repository-packages' ] }
+    - { role: install-NSO, tags: [ 'install-NSO' ] , when: NSOInstallType is defined }
+    - { role: install-NEDs, tags: [ 'install-NEDs' ] , when: NEDs is defined }
+    - { role: install-repository-packages, tags: [ 'install-repository-packages' ] , when RepositoryURL is defoned }
     - { role: setup-netsim, tags: [ 'setup-netsim' ] , when: NetsimDevices is defined }
     - { role: setup-HA, tags: [ 'setup-HA' ] , when: SetupHA }
