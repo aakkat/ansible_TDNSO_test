@@ -5,7 +5,7 @@ library identifier: 'nso-pipeline-library@master', retriever: modernSCM(
     [$class       : 'GitSCMSource',
         remote       : 'https://wwwin-github.cisco.com/AS-Community/nso-pipeline-library.git',
         credentialsId: "${credentialsId}"])
-library identifier: 'rasta-pipeline-library@cxts-trial', retriever: modernSCM(
+library identifier: 'rasta-pipeline-library@cxta-trial', retriever: modernSCM(
     [$class       : 'GitSCMSource',
         remote       : 'https://wwwin-github.cisco.com/AS-Community/rasta-pipeline-library.git',
         credentialsId: "${credentialsId}"])
