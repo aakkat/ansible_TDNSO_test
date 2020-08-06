@@ -110,7 +110,7 @@ node("${SPADE_node}") {
             dockerImage.exec(containerId: "${ansibleContainer.id}",
                 type: "single",
                 user: "root",
-                commands: ["cd ${remoteDependeciesDir}/${dependeciesDir)", "ansible-playbook -i ansible_hosts aNSOble.yml --ask-vault-pass -vvv"])
+                commands: ["cd ${remoteDependeciesDir}/${dependeciesDir}", "ansible-playbook -i ansible_hosts aNSOble.yml --ask-vault-pass -vvv"])
             
         }
 
