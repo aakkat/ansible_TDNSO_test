@@ -94,7 +94,7 @@ node("${SPADE_node}") {
                 def remoteDependeciesDir = "/tmp"
 
 
-                ret = sh(script: "docker cp ${WORKSPACE}/${dependenciesDir} ${ansibleContainer.id}:${remoteDependeciesDir}; echo \$?",
+                ret = sh(script: "docker cp ${WORKSPACE} ${ansibleContainer.id}:${remoteDependeciesDir}; echo \$?",
                       returnStdout: true).trim()
                 echo "Copying status: ${ret}"          
             }
