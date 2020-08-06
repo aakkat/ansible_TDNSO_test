@@ -2,6 +2,7 @@
 
 Project goal is to create an automation for NSO deployment and configuration with Ansible.
 
+Link to pipeline: https://engci-private-gpk.cisco.com/jenkins/cs-emear/job/sandbox/job/AS-Customer/job/aNSOble/
 **This project may be used internally.**
 
 ## Usage
