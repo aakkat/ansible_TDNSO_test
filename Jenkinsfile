@@ -44,7 +44,7 @@ def SPADE_node = "emear-sio-slv04"
 // ansible variables
 def ansible_image_url = "williamyeh/ansible:centos7"
 def ansibleDirectory = "aNSOble"
-
+def remoteDependeciesDir = "/tmp"
 
 
 ansiColor('xterm') { timestamps {
@@ -91,17 +91,16 @@ node("${SPADE_node}") {
         stage('Ansible Container Coping Folders') {
             dir("${WORKSPACE}") {
                 println "Copy Dependecies"
-                def remoteDependeciesDir = "/tmp"
 
 
-                ret = sh(script: "docker cp ${WORKSPACE} ${ansibleContainer.id}:${remoteDependeciesDir}; echo \$?",
+                ret = sh(script: "docker cp ${WORKSPACE} ${ansibleContainer.id}:/tmp; echo \$?",
                       returnStdout: true).trim()
                 echo "Copying status: ${ret}"          
             }
                 dockerImage.exec(containerId: "${ansibleContainer.id}",
                     type: "single",
                     user: "root",
-                    commands: ["cp -rf ${remoteDependeciesDir}/ansible.cfg /etc/ansible/ansible.cfg", "ls"])
+                    commands: ["cp -rf /tmp/ansible.cfg /etc/ansible/ansible.cfg", "ls"])
             
         }
 
@@ -109,7 +108,7 @@ node("${SPADE_node}") {
             dockerImage.exec(containerId: "${ansibleContainer.id}",
                 type: "single",
                 user: "root",
-                commands: ["cd ${remoteDependeciesDir}/${ansibleDirectory}", "ansible-playbook -i ansible_hosts aNSOble.yml --ask-vault-pass -vvv"])
+                commands: ["cd /tmp/${ansibleDirectory}", "ansible-playbook -i ansible_hosts aNSOble.yml --ask-vault-pass -vvv"])
         }
 
     }
