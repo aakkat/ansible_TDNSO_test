@@ -113,7 +113,7 @@ node("${SPADE_node}") {
             dockerImage.exec(containerId: "${ansibleContainer.id}",
                 type: "single",
                 user: "root",
-                commands: ["cd /tmp/aNSOble/${ansibleDirectory}", "ansible-playbook -i ansible_hosts aNSOble.yml --ask-vault-pass -vvv"])
+                commands: ["cd /tmp/aNSOble/${ansibleDirectory}", "ansible-playbook -i ansible_hosts aNSOble.yml --vault-password-file vault_pass.txt -v"])
         }
 
     }
