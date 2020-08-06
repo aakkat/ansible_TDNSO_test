@@ -1,9 +1,3 @@
-properties([
-  parameters([
-    booleanParam(name: 'Remove_Background_Dockers', defaultValue: false)
-  ])
-])
-
 def credentialsId = params.credentialsId
 
 // library mantaining groovy files which are adding functionality 
@@ -11,7 +5,7 @@ library identifier: 'nso-pipeline-library@master', retriever: modernSCM(
     [$class       : 'GitSCMSource',
         remote       : 'https://wwwin-github.cisco.com/AS-Community/nso-pipeline-library.git',
         credentialsId: "${credentialsId}"])
-library identifier: 'rasta-pipeline-library@cxta-trial', retriever: modernSCM(
+library identifier: 'rasta-pipeline-library@ansible-trial', retriever: modernSCM(
     [$class       : 'GitSCMSource',
         remote       : 'https://wwwin-github.cisco.com/AS-Community/rasta-pipeline-library.git',
         credentialsId: "${credentialsId}"])
@@ -23,7 +17,7 @@ library identifier: 'as-jenkins-pipeline-utils-dsl@master', retriever: modernSCM
 @Library('AutomateEverything@1.2') // global Library should be see
 import com.cisco.docker.* 
 import com.cisco.nso.*
-import com.cisco.cxta.*
+import com.cisco.ansible.*
 import com.cisco.jenkins.*
 import java.text.SimpleDateFormat
 
@@ -47,6 +41,9 @@ def EMAIL = "mdobieck@cisco.com"
 def gitProjectUrl = "https://wwwin-github.cisco.com/mdobieck/ansible_nso_automation.git"
 // One of the available cs-emear
 def SPADE_node = "emear-sio-slv04" 
+// ansible variables
+def ansible_image_url = "ansible/ansible"
+
 
 
 ansiColor('xterm') { timestamps {
@@ -80,17 +77,30 @@ node("${SPADE_node}") {
                 throw new Exception("ERROR: Docker Network creation failed")
             }
         }
+        stage('Ansible Container Creation') {
+            echo "Ansible starts here"
+            ansibleImage = docker.image("${ansible_image_url}")
+            ansibleImage.pull()
+            echo "ansible container pulled successfully"
+            // ansible_container_ has to be named rasta_container_ because of coping function
+            ansibleContainer = ansibleImage.run("--name ansible-${buildIdNumber} --network=${cicd_network_name}", "tail -f /dev/null")
+            echo "ansible Container ID = ${ansibleContainer.id}"
+            ansible_ip = dockerImage.getContainerIPaddress(containerId: "${ansibleContainer.id}", networkName: "${cicd_network_name}")
+            echo "ansible Container IP = ${ansible_ip}"
+        }
     }
     catch (error) {
         echo "Exception: " + error
         echo "Cleaning up: "
-
+        sh "docker network disconnect ${cicd_network_name} ansible-${buildIdNumber} || true"
+        sh "docker rm --force ansible-${buildIdNumber} || true"
         sh "docker network rm ${cicd_network_name} || true"
         throw error
     }
     finally {
+        sh "docker network disconnect ${cicd_network_name} ansible-${buildIdNumber} || true"
+        sh "docker rm --force ansible-${buildIdNumber} || true"
         sh "docker network rm ${cicd_network_name} || true"
-
     }
 }
 }}
