@@ -42,7 +42,7 @@ def gitProjectUrl = "https://wwwin-github.cisco.com/mdobieck/ansible_nso_automat
 // One of the available cs-emear
 def SPADE_node = "emear-sio-slv04" 
 // ansible variables
-def ansible_image_url = "ansible/ansible"
+def ansible_image_url = "ansible/ansible:default"
 
 
 
