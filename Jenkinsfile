@@ -100,12 +100,12 @@ node("${SPADE_node}") {
                 dockerImage.exec(containerId: "${ansibleContainer.id}",
                     type: "single",
                     user: "root",
-                    commands: ["cd /tmp", "ls"])
+                    commands: ["cd /tmp/aNSOble", "ls"])
 
                 dockerImage.exec(containerId: "${ansibleContainer.id}",
                     type: "single",
                     user: "root",
-                    commands: ["cp -rf /tmp/ansible.cfg /etc/ansible/ansible.cfg", "ls"])
+                    commands: ["cp -rf /tmp/aNSOble/ansible.cfg /etc/ansible/ansible.cfg", "ls"])
             
         }
 
@@ -113,7 +113,7 @@ node("${SPADE_node}") {
             dockerImage.exec(containerId: "${ansibleContainer.id}",
                 type: "single",
                 user: "root",
-                commands: ["cd /tmp/${ansibleDirectory}", "ansible-playbook -i ansible_hosts aNSOble.yml --ask-vault-pass -vvv"])
+                commands: ["cd /tmp/aNSOble/${ansibleDirectory}", "ansible-playbook -i ansible_hosts aNSOble.yml --ask-vault-pass -vvv"])
         }
 
     }
