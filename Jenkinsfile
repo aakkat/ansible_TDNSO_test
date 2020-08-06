@@ -42,7 +42,7 @@ def gitProjectUrl = "https://wwwin-github.cisco.com/mdobieck/ansible_nso_automat
 // One of the available cs-emear
 def SPADE_node = "emear-sio-slv04" 
 // ansible variables
-def ansible_image_url = "ansible/ansible:default"
+def ansible_image_url = "williamyeh/ansible:centos7"
 
 
 
@@ -87,6 +87,33 @@ node("${SPADE_node}") {
             ansible_ip = dockerImage.getContainerIPaddress(containerId: "${ansibleContainer.id}", networkName: "${cicd_network_name}")
             echo "ansible Container IP = ${ansible_ip}"
         }
+        stage('Ansible Container Coping Folders') {
+            dir("${WORKSPACE}") {
+                println "Copy Dependecies"
+                def dependenciesDir = "aNSOble"
+                def remoteDependeciesDir = "/tmp"
+
+
+                ret = sh(script: "docker cp ${WORKSPACE}/${dependenciesDir} ${ansibleContainer.id}:${remoteDependeciesDir}; echo \$?",
+                      returnStdout: true).trim()
+                echo "Copying status: ${ret}"          
+            }
+
+            dockerImage.exec(containerId: "${nsoContainerId}",
+                type: "single",
+                user: "root",
+                commands: ["source /opt/ncs/current/ncsrc", "/etc/init.d/ncs start"])
+            
+        }
+
+        stage('Ansible Running') {
+            dockerImage.exec(containerId: "${ansibleContainer.id}",
+                type: "single",
+                user: "root",
+                commands: ["cd ${remoteDependeciesDir}/${dependeciesDir)", "ansible-playbook -i ansible_hosts aNSOble.yml --ask-vault-pass -vvv"])
+            
+        }
+
     }
     catch (error) {
         echo "Exception: " + error
