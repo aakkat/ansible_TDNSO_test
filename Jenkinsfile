@@ -5,7 +5,7 @@ library identifier: 'nso-pipeline-library@master', retriever: modernSCM(
     [$class       : 'GitSCMSource',
         remote       : 'https://wwwin-github.cisco.com/AS-Community/nso-pipeline-library.git',
         credentialsId: "${credentialsId}"])
-library identifier: 'rasta-pipeline-library@ansible-trial', retriever: modernSCM(
+library identifier: 'rasta-pipeline-library@cxts-trial', retriever: modernSCM(
     [$class       : 'GitSCMSource',
         remote       : 'https://wwwin-github.cisco.com/AS-Community/rasta-pipeline-library.git',
         credentialsId: "${credentialsId}"])
@@ -17,7 +17,7 @@ library identifier: 'as-jenkins-pipeline-utils-dsl@master', retriever: modernSCM
 @Library('AutomateEverything@1.2') // global Library should be see
 import com.cisco.docker.* 
 import com.cisco.nso.*
-import com.cisco.ansible.*
+import com.cisco.cxta.*
 import com.cisco.jenkins.*
 import java.text.SimpleDateFormat
 
@@ -82,7 +82,6 @@ node("${SPADE_node}") {
             ansibleImage = docker.image("${ansible_image_url}")
             ansibleImage.pull()
             echo "ansible container pulled successfully"
-            // ansible_container_ has to be named rasta_container_ because of coping function
             ansibleContainer = ansibleImage.run("--name ansible-${buildIdNumber} --network=${cicd_network_name}", "tail -f /dev/null")
             echo "ansible Container ID = ${ansibleContainer.id}"
             ansible_ip = dockerImage.getContainerIPaddress(containerId: "${ansibleContainer.id}", networkName: "${cicd_network_name}")
