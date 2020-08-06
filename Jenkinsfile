@@ -43,6 +43,7 @@ def gitProjectUrl = "https://wwwin-github.cisco.com/mdobieck/ansible_nso_automat
 def SPADE_node = "emear-sio-slv04" 
 // ansible variables
 def ansible_image_url = "williamyeh/ansible:centos7"
+def ansibleDirectory = "aNSOble"
 
 
 
@@ -90,7 +91,6 @@ node("${SPADE_node}") {
         stage('Ansible Container Coping Folders') {
             dir("${WORKSPACE}") {
                 println "Copy Dependecies"
-                def dependenciesDir = "aNSOble"
                 def remoteDependeciesDir = "/tmp"
 
 
@@ -98,11 +98,10 @@ node("${SPADE_node}") {
                       returnStdout: true).trim()
                 echo "Copying status: ${ret}"          
             }
-
-            dockerImage.exec(containerId: "${nsoContainerId}",
-                type: "single",
-                user: "root",
-                commands: ["source /opt/ncs/current/ncsrc", "/etc/init.d/ncs start"])
+                dockerImage.exec(containerId: "${ansibleContainer.id}",
+                    type: "single",
+                    user: "root",
+                    commands: ["cp -rf ${remoteDependeciesDir}/ansible.cfg /etc/ansible/ansible.cfg", "ls"])
             
         }
 
@@ -110,8 +109,7 @@ node("${SPADE_node}") {
             dockerImage.exec(containerId: "${ansibleContainer.id}",
                 type: "single",
                 user: "root",
-                commands: ["cd ${remoteDependeciesDir}/${dependeciesDir}", "ansible-playbook -i ansible_hosts aNSOble.yml --ask-vault-pass -vvv"])
-            
+                commands: ["cd ${remoteDependeciesDir}/${ansibleDirectory}", "ansible-playbook -i ansible_hosts aNSOble.yml --ask-vault-pass -vvv"])
         }
 
     }
