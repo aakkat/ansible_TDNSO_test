@@ -100,6 +100,11 @@ node("${SPADE_node}") {
                 dockerImage.exec(containerId: "${ansibleContainer.id}",
                     type: "single",
                     user: "root",
+                    commands: ["ls"])
+
+                dockerImage.exec(containerId: "${ansibleContainer.id}",
+                    type: "single",
+                    user: "root",
                     commands: ["cp -rf /tmp/ansible.cfg /etc/ansible/ansible.cfg", "ls"])
             
         }
