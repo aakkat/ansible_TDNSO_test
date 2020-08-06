@@ -39,6 +39,7 @@ def startDate = dateFormat.format(date)
 // Pipeline Variables
 def buildNum = "${env.BUILD_NUMBER}"
 def buildIdNumber = buildId() // Unique buildId based upon the Jenkins Job & Build Number
+def cicd_network_name = "cicd_network_name_" + "${buildIdNumber}" 
 credentialsId = "345c79bc-9def-4981-94b5-d8190fdd2304"
 
 // ###Project Variables
@@ -59,14 +60,36 @@ node("${SPADE_node}") {
                     url: "${gitProjectUrl}"]]])    
         }
 
+        stage('Create Docker Network') {
+            docker_containers = sh (script: "docker ps", returnStdout: true)
+            echo "Docker Containers: ${docker_containers}"
+            
+            echo "Removing old containers" 
+            remDock = dockerImage.cleanJobEnv()
+            echo "docker remove ${remDock}"
+            
+            docker_network = dockerImage.createRandomPrivateNetwork(networkName: "${cicd_network_name}", networkMask: "29", retries: 10)
+            echo "Subnet is ${docker_network}"
+            docker_networks = sh (script: "docker network ls", returnStdout: true)
+            echo "Docker Networks: ${docker_networks}"
+            
+            if (docker_networks.contains("${cicd_network_name}") ) {
+                echo "Docker Network was properly created."
+            } else {
+                echo "ERROR: Couldn't create docker network."
+                throw new Exception("ERROR: Docker Network creation failed")
+            }
+        }
     }
     catch (error) {
         echo "Exception: " + error
         echo "Cleaning up: "
 
+        sh "docker network rm ${cicd_network_name} || true"
         throw error
     }
     finally {
+        sh "docker network rm ${cicd_network_name} || true"
 
     }
 }
