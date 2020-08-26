@@ -38,8 +38,8 @@
     path: /etc/hosts
     marker: "## {mark} Added by ansible (setting up hosts)"
     block: |
-      primary {{ PrimaryIP }}
-      secondary {{ SecondaryIP }}
+      {{ PrimaryIP }} primary
+      {{ SecondaryIP }} secondary
   become: true
 
 - name: Setup of HA as Enabled in /etc/ncs/ncs.conf 

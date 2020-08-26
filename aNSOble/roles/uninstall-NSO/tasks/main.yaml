@@ -14,6 +14,12 @@
   ignore_errors: yes
   become: true
 
+- name: Stop NSO service
+  service:
+    name: ncs
+    state: stopped
+  become: true
+
 - name: Uninstall NSO
   shell: ncs-uninstall --all --non-interactive >> /tmp/aNSOble.log
   environment:

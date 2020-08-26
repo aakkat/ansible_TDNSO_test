@@ -1,8 +1,8 @@
 #List of linux packages to install
 #This is a common base for Ubuntu:
-#linuxPackages: ['git', 'make', 'wget', 'python-minimal', 'openjdk-8-jdk', 'ant', 'xsltproc', 'iputils-arping'] 
+linuxPackages: ['git', 'make', 'wget', 'python-minimal', 'openjdk-8-jdk', 'ant', 'xsltproc', 'iputils-arping'] 
 #This is a common base for CentOS/RHEL:
-linuxPackages: ['git', 'make', 'wget', 'python2', 'java', 'ant', 'libxslt', 'iputils'] 
+#linuxPackages: ['git', 'make', 'wget', 'python2', 'java', 'ant', 'libxslt', 'iputils'] 
 
 #Type of copy for the NSO install file, can be local or remote
 #NSOCopyType: remote
@@ -74,12 +74,12 @@ NetsimDir: /var/opt/ncs/packages/
 SetupHA: true
 TailfHCCVersion: 4.5.0
 TailfHCCNSOVersion: 5.3.2
-PrimaryIP: 10.48.190.170
-SecondaryIP: 10.48.190.171
+PrimaryIP: 10.48.190.167
+SecondaryIP: 10.48.190.168
 VIP: 10.48.190.169
 VIPNetMask: 255.255.255.128
-VIPInterfacePrimary: ens32
-VIPInterfaceSecondary: ens32
+VIPInterfacePrimary: ens192
+VIPInterfaceSecondary: ens192
 HAToken: cisco123
 HAInterval: 4
 HAFailureLimit: 10

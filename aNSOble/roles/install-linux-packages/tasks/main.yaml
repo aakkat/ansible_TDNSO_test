@@ -16,8 +16,3 @@
   become: true
   loop: "{{ linuxPackages }}"
   when: linuxPackages is defined
-
-- name: Setup default python version
-  shell: alternatives --set python /usr/bin/python3
-  become: true
-  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'

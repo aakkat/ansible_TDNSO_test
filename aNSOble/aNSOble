@@ -1,0 +1,11 @@
+#!/usr/bin/env python
+import argparse
+
+# Construct the argument parser
+ap = argparse.ArgumentParser()
+ap.add_argument("hosts-list", help="List of IPs on which you want to install NSO, comma separated")
+ap.add_argument("-s", "--setupfile", help="Path to setup_data.yml file (Default is ./setup_data.yml)", default="setup_data.yml")
+ap.add_argument("-S", "--secure-setupfile", help="Path to setup_data_secure.yml file (Default is ./setup_data_secure.yml)", default="setup_data.yml")
+ap.add_argument("-t", "--steps", help="Steps you want to perform, comma separated  (Default is all, accepted values are are all, install-linux-packages, install-NSO, install-NEDs, install-repository-packages, setup-netsim and setup-HA)", default="all")
+args= ap.parse_args()
+print args
