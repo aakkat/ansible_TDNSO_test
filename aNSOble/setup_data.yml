@@ -1,3 +1,7 @@
+## Enter Parent LOG Directory path where you want to save logs of NSO server and APP. logs_$hostname directory would be created under this parent directory.
+LOG_DIR: "/tmp"
+
+
 #List of linux packages to install
 #This is a common base for Ubuntu:
 #linuxPackages: ['git', 'make', 'wget', 'python-minimal', 'openjdk-8-jdk', 'ant', 'xsltproc', 'iputils-arping'] 
