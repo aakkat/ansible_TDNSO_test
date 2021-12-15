@@ -1,0 +1,294 @@
+        - shell: hostname -f
+          register: output
+        - set_fact:
+               HOST: "{{output.stdout}}"
+
+        - name: Create Directory {{LOG_DIR}}/logs_{{HOST}} on remote server
+          file:
+             path: "{{LOG_DIR}}/logs_{{HOST}}"
+             state: directory
+          delegate_to: localhost
+        - set_fact:
+                LOG_DIRR: "{{LOG_DIR}}/logs_{{HOST}}"
+
+        - name: setting date variable
+          shell: date "+%F-%H-%M-%S"
+          register: out
+        - set_fact:
+             DATE: "{{out.stdout}}"
+        - debug:
+             msg: "file name would be in format log_TASK_{{DATE}}.extension"
+      
+        - name: Identify the Linux flavor, JAVA,PYTHON,NCS,ANT Version
+          shell: |
+             hostnamectl
+             java -version
+             python --version
+             echo "ncs version:";ncs --version
+             ant -version
+          register: logg
+          ignore_errors: true
+        - debug:
+              msg:
+                - "{{logg.stdout_lines}}"
+                - "{{ logg.stderr_lines }}"
+        - name: Write results to logfile {{LOG_DIRR}}/log_VERSION_{{DATE}}.txt
+          block:
+            - shell: |
+                 echo "{{logg.stdout}}" > {{LOG_DIRR}}/log_VERSION_{{DATE}}.txt
+                 echo "{{logg.stderr}}" >> {{LOG_DIRR}}/log_VERSION_{{DATE}}.txt
+          delegate_to: localhost
+
+        - name: Check NSO server status,reachability
+          shell:  ps -aux | grep ncs.conf
+          register: output
+        - name: Write results to logfile {{LOG_DIRR}}/log_NSO_VAL_{{DATE}}
+          block:
+            - shell: echo "{{output.stdout}}" > {{LOG_DIRR}}/log_NSO_VAL_{{DATE}}.txt
+          delegate_to: localhost
+
+        - name: Check unix flavor
+          shell: uname -a
+          register: out3
+
+        - name: Check linux kernel version
+          shell: uname -r
+          register: out3
+        - debug:
+              msg: "{{out3.stdout}}"
+        - name: get linux lib for ubuntu
+          block:
+             - shell: apt list --installed
+               register: output
+             - debug:
+                  msg: "{{output.stdout_lines}}"
+          when: "'x86_64' not in out3.stdout"
+        - name: get linux lib for centos/RHEL
+          block:
+             - shell: yum list
+               register: output
+             - debug:
+                  msg: "{{output.stdout_lines}}"
+          when: "'x86_64' in out3.stdout"
+        - name: Write results to logfile {{LOG_DIRR}}/log_linux_lib_{{DATE}}.txt
+          block:
+            - copy:
+                 content:  "{{output.stdout}}"
+                 dest: "{{LOG_DIRR}}/log_linux_lib_{{DATE}}.txt"
+          delegate_to: localhost
+        - name: get python lib
+          shell: pip list
+          register: output
+        - debug:
+             msg: "{{output.stdout_lines}}"
+        - name: Write results to logfile {{LOG_DIRR}}/log_python_lib_{{DATE}}.txt
+          block:
+              - copy:
+                 content:  "{{output.stdout}}"
+                 dest: "{{LOG_DIRR}}/log_python_lib_{{DATE}}.txt"
+          delegate_to: localhost
+
+        - name: HA state status
+          shell: echo "show ncs-state ha | display xml" | ncs_cli -C
+          register: output
+          ignore_errors: true
+        - debug:
+              msg: "{{output.stdout}}"
+        - name: Write results to logfile {{LOG_DIRR}}/log_HA_STATUS_{{DATE}}.xml
+          block:
+            - shell: echo "{{output.stdout}}" > {{LOG_DIRR}}/log_HA_STATUS_{{DATE}}.xml
+            - name: Data Modification
+              shell: |
+                  cat {{LOG_DIRR}}/log_HA_STATUS_{{DATE}}.xml | sed -z 's/,/\n/g' > {{LOG_DIRR}}/log1_HA_STATUS_{{DATE}}.xml
+                  mv {{LOG_DIRR}}/log1_HA_STATUS_{{DATE}}.xml {{LOG_DIRR}}/log_HA_STATUS_{{DATE}}.xml
+          delegate_to: localhost
+
+        - name: HA configuration
+          shell: echo "show running-config ha | display xml" | ncs_cli -C
+          register: output
+          ignore_errors: true
+        - debug:
+              msg: "{{output.stdout}}"
+        - name: Write results to logfile {{LOG_DIRR}}/log_HA_CONFIG_{{DATE}}.xml
+          block:
+            - shell: echo "{{output.stdout}}" > {{LOG_DIRR}}/log_HA_CONFIG_{{DATE}}.xml
+            - name: Data Modification
+              shell: |
+                  cat {{LOG_DIRR}}/log_HA_CONFIG_{{DATE}}.xml | sed -z 's/,/\n/g' > {{LOG_DIRR}}/log1_HA_CONFIG_{{DATE}}.xml
+                  mv {{LOG_DIRR}}/log1_HA_CONFIG_{{DATE}}.xml {{LOG_DIRR}}/log_HA_CONFIG_{{DATE}}.xml
+          delegate_to: localhost
+
+        - name: Resource Pool configuration
+          shell: echo "show running-config resource-pools ip-address-pool | display xml" | ncs_cli -C
+          register: output
+          ignore_errors: true
+        - debug:
+              msg: "{{output.stdout}}"
+        - name: Write results to logfile  {{LOG_DIRR}}/log_NSO_RESOURCEPOOL_{{DATE}}.xml
+          block:
+            - shell: echo "{{output.stdout}}" > {{LOG_DIRR}}/log_NSO_RESOURCEPOOL_{{DATE}}.xml
+            - name: Data Modification
+              shell: |
+                  cat {{LOG_DIRR}}/log_NSO_RESOURCEPOOL_{{DATE}}.xml | sed -z 's/,/\n/g' > {{LOG_DIRR}}/log1_NSO_RESOURCEPOOL_{{DATE}}.xml
+                  mv {{LOG_DIRR}}/log1_NSO_RESOURCEPOOL_{{DATE}}.xml {{LOG_DIRR}}/log_NSO_RESOURCEPOOL_{{DATE}}.xml
+          delegate_to: localhost
+
+        - name: Logging python-vm config
+          shell: echo " show running-config python-vm| display xml" | ncs_cli -C
+          register: output
+          ignore_errors: true
+        - debug:
+              msg: "{{output.stdout}}"
+        - name: Write results to logfile {{LOG_DIRR}}/log_python-vm_Logging_{{DATE}}.xml
+          block:
+            - shell: echo "{{output.stdout}}" > {{LOG_DIRR}}/log_python-vm_Logging_{{DATE}}.xml
+            - name: Data Modification
+              shell: |
+                  cat {{LOG_DIRR}}/log_python-vm_Logging_{{DATE}}.xml | sed -z 's/,/\n/g' > {{LOG_DIRR}}/log1_python-vm_Logging_{{DATE}}.xml
+                  mv {{LOG_DIRR}}/log1_python-vm_Logging_{{DATE}}.xml {{LOG_DIRR}}/log_python-vm_Logging_{{DATE}}.xml
+          delegate_to: localhost
+
+        - name: Logging java-vm config
+          shell: echo "show running-config java-vm | display xml" | ncs_cli -C
+          register: output
+          ignore_errors: true
+        - debug:
+              msg: "{{output.stdout}}"
+        - name: Write results to logfile {{LOG_DIRR}}/log_java-vm_Logging_{{DATE}}.xml
+          block:
+            - shell: echo "{{output.stdout}}" > {{LOG_DIRR}}/log_java-vm_Logging_{{DATE}}.xml
+            - name: Data Modification
+              shell: |
+                  cat {{LOG_DIRR}}/log_java-vm_Logging_{{DATE}}.xml | sed -z 's/,/\n/g' > {{LOG_DIRR}}/log1_java-vm_Logging_{{DATE}}.xml
+                  mv {{LOG_DIRR}}/log1_java-vm_Logging_{{DATE}}.xml {{LOG_DIRR}}/log_java-vm_Logging_{{DATE}}.xml
+          delegate_to: localhost
+
+
+        - name: Show Service packages with oper-status
+          shell:  echo "show packages package oper-status" | ncs_cli -C | awk '{print $3}' | grep -v ^$ | grep -Ev '*[0-9].[0-9]*'
+          register: output1
+          ignore_errors: true
+        - debug:
+              msg: "{{output1.stdout_lines}}"
+        - block:
+            - shell: echo "{{output1.stdout}}" > {{LOG_DIRR}}/log_package_list_{{DATE}}
+            - name: Data Modification
+              shell: |
+                  cat {{LOG_DIRR}}/log_package_list_{{DATE}} | sed -z 's/,/\n/g' > {{LOG_DIRR}}/log1_package_list_{{DATE}}
+                  mv {{LOG_DIRR}}/log1_package_list_{{DATE}} {{LOG_DIRR}}/log_package_list_{{DATE}} 
+          delegate_to: localhost
+
+        - name: Show Service packages count
+          shell: echo "show packages package oper-status" | ncs_cli -C | awk '{print $3}' | grep -v ^$ | wc -l 
+          register: output
+        - debug:
+             msg: " Service packages count is {{output.stdout}}"
+        - block:
+            - shell: echo "Service packages count is {{output.stdout}}" > {{LOG_DIRR}}/log_SERVICE_PACKAGE_COUNT_{{DATE}}
+          delegate_to: localhost
+        - name: Show Service packages configuration per package
+          include_role:
+            name: package_list
+          with_lines: cat {{LOG_DIRR}}/log_package_list_{{DATE}}
+
+        - name: extract devices configurations from CDB
+          block:
+           - name: Show Devices
+             shell: echo "show devices device platform" | ncs_cli -C
+             register: output
+           - debug:
+                 msg: "{{output.stdout_lines}}"
+           - name: Extract Devices name list
+             shell: echo "show devices device platform | display xml" | ncs_cli -C | grep -i name | grep -v ios | awk -F ">" '{print $2}' | awk -F "<" '{print $1}'
+             register: output
+           - debug:
+                  msg: "{{output.stdout_lines}}"
+           - name: Extract Device configuration and save in cfg files
+             include_role:
+                    name: extract_config
+             loop: "{{output.stdout_lines}}"
+
+        - name: Show NED List
+          shell:  echo "show devices ned-ids ned-id | display xml" | ncs_cli -C
+          register: output
+          ignore_errors: true
+        - debug:
+              msg: "{{output.stdout_lines}}"
+        - block:
+            - shell: echo "{{output.stdout}}" > {{LOG_DIRR}}/log_NED_list_{{DATE}}.xml
+            - name: Data Modification
+              shell: |
+                  cat {{LOG_DIRR}}/log_NED_list_{{DATE}}.xml | sed -z 's/,/\n/g' > {{LOG_DIRR}}/log1_NED_list_{{DATE}}.xml
+                  mv {{LOG_DIRR}}/log1_NED_list_{{DATE}}.xml {{LOG_DIRR}}/log_NED_list_{{DATE}}.xml
+          delegate_to: localhost
+
+        - name: Show NED Settings
+          shell:  echo "show running-config devices device ned-settings | display xml" | ncs_cli -C
+          register: output
+          ignore_errors: true
+        - debug:
+              msg: "{{output.stdout_lines}}"
+        - block:
+            - shell: echo "{{output.stdout}}" > {{LOG_DIRR}}/log_NED_SETTINGS_{{DATE}}.xml
+            - name: Data Modification
+              shell: |
+                  cat {{LOG_DIRR}}/log_NED_SETTINGS_{{DATE}}.xml | sed -z 's/,/\n/g' > {{LOG_DIRR}}/log1_NED_SETTINGS_{{DATE}}.xml
+                  mv {{LOG_DIRR}}/log1_NED_SETTINGS_{{DATE}}.xml {{LOG_DIRR}}/log_NED_SETTINGS_{{DATE}}.xml
+          delegate_to: localhost
+
+        - name: Show Devices State
+          shell:  echo "show devices device state | display xml" | ncs_cli -C
+          register: output
+          ignore_errors: true
+        - debug:
+              msg: "{{output.stdout_lines}}"
+        - block:
+            - shell: echo "{{output.stdout}}" > {{LOG_DIRR}}/log_DEVICE_STATE_{{DATE}}.xml
+            - name: Data Modification
+              shell: |
+                  cat {{LOG_DIRR}}/log_DEVICE_STATE_{{DATE}}.xml | sed -z 's/,/\n/g' > {{LOG_DIRR}}/log1_DEVICE_STATE_{{DATE}}.xml
+                  mv {{LOG_DIRR}}/log1_DEVICE_STATE_{{DATE}}.xml {{LOG_DIRR}}/log_DEVICE_STATE_{{DATE}}.xml
+          delegate_to: localhost
+
+        - name: Show Auth Group
+          shell:  echo "show running-config devices authgroups | display xml" | ncs_cli -C
+          register: output
+          ignore_errors: true
+        - debug:
+              msg: "{{output.stdout_lines}}"
+        - block:
+            - shell: echo "{{output.stdout}}" > {{LOG_DIRR}}/log_AUTH_GROUP_{{DATE}}.xml
+            - name: Data Modification
+              shell: |
+                  cat {{LOG_DIRR}}/log_AUTH_GROUP_{{DATE}}.xml | sed -z 's/,/\n/g' > {{LOG_DIRR}}/log1_AUTH_GROUP_{{DATE}}.xml
+                  mv {{LOG_DIRR}}/log1_AUTH_GROUP_{{DATE}}.xml {{LOG_DIRR}}/log_AUTH_GROUP_{{DATE}}.xml
+          delegate_to: localhost
+
+        - name: Show Device Group
+          shell:  echo "show devices device-group | display xml" | ncs_cli -C
+          register: output
+          ignore_errors: true
+        - debug:
+              msg: "{{output.stdout_lines}}"
+        - block:
+            - shell: echo "{{output.stdout}}" > {{LOG_DIRR}}/log_DEVICE_GROUP_{{DATE}}.xml
+            - name: Data Modification
+              shell: |
+                  cat {{LOG_DIRR}}/log_DEVICE_GROUP_{{DATE}}.xml | sed -z 's/,/\n/g' > {{LOG_DIRR}}/log1_DEVICE_GROUP_{{DATE}}.xml
+                  mv {{LOG_DIRR}}/log1_DEVICE_GROUP_{{DATE}}.xml {{LOG_DIRR}}/log_DEVICE_GROUP_{{DATE}}.xml
+          delegate_to: localhost
+
+        - name: Show Device Global Setting
+          shell:  echo "show running-config devices global-settings  | display xml" | ncs_cli -C
+          register: output
+          ignore_errors: true
+        - debug:
+              msg: "{{output.stdout_lines}}"
+        - block:
+            - shell: echo "{{output.stdout}}" > {{LOG_DIRR}}/log_DEVICE_SETTING_{{DATE}}.xml
+            - name: Data Modification
+              shell: |
+                  cat {{LOG_DIRR}}/log_DEVICE_SETTING_{{DATE}}.xml | sed -z 's/,/\n/g' > {{LOG_DIRR}}/log1_DEVICE_SETTING_{{DATE}}.xml
+                  mv {{LOG_DIRR}}/log1_DEVICE_SETTING_{{DATE}}.xml {{LOG_DIRR}}/log_DEVICE_SETTING_{{DATE}}.xml
+          delegate_to: localhost
+
