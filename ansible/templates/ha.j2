@@ -1,0 +1,21 @@
+<data><high-availability xmlns="http://tail-f.com/ns/ncs">
+               <token>{{ HAToken }}</token>
+               <ha-node>
+                 <id>master</id>
+                 <address>{{ PrimaryIP }}</address>
+                 <nominal-role>master</nominal-role>
+               </ha-node>
+               <ha-node>
+                 <id>secondary</id>
+                 <address>{{ SecondaryIP }}</address>
+                 <nominal-role>slave</nominal-role>
+               </ha-node>
+               <settings>
+                 <reconnect-interval>{{ HAInterval }}</reconnect-interval>
+                 <reconnect-attempts>{{ HAFailureLimit }}</reconnect-attempts>
+               </settings>
+             </high-availability>
+             <hcc xmlns="http://cisco.com/pkg/tailf-hcc">
+               <vip-address>{{ VIP }}</vip-address>
+             </hcc>
+            </data>

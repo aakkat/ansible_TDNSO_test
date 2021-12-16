@@ -1,4 +1,4 @@
-# aNSOble
+﻿# aNSOble
 
 Project goal is to create an automation for NSO deployment and configuration with Ansible.
 
@@ -44,7 +44,7 @@ The next step is editing the server addresses used by the aNSOble playbook. You 
 
 Final step is running the aNSOble playbook. To run the playbook you need to run the command:
 
-```ansible-playbook -i ansible_hosts aNSOble.yml --ask-vault-pass -vvv```
+```ansible-playbook aNSOble.yml --ask-vault-pass -vvv```
 
 If you already have one of the stages already deployed on your setup you only need to add the "skip-tags" option:
 
@@ -53,26 +53,31 @@ If you already have one of the stages already deployed on your setup you only ne
 The content of the aNSOble.yml file is the following:
 
 ```{bash}
-- hosts: servers
+- hosts: ubuntu
+  gather_facts: no
+  connection: local
   vars_files:
-    - 'setup_data.yml'
-    - 'setup_data_secure.yml'
+    - setup_data.yml
+    - setup_data_secure.yml
+  roles:
+    - { role: Ubuntu_vcenter_deploy, tags: [ 'install vm' ] , when: VM_INSTALL }
+- hosts: ubuntu
+  vars_files:
+    - setup_data.yml
+    - setup_data_secure.yml
   roles:
     - { role: install-linux-packages, tags: [ 'install-linux-packages' ] }
     - { role: install-NSO, tags: [ 'install-NSO' ] , when: NSOInstallType is defined }
     - { role: install-NEDs, tags: [ 'install-NEDs' ] , when: NEDs is defined }
-    - { role: install-repository-packages, tags: [ 'install-repository-packages' ] , when RepositoryURL is defoned }
+    - { role: install-repository-packages, tags: [ 'install-repository-packages' ] , when: RepositoryURL is defined }
     - { role: setup-netsim, tags: [ 'setup-netsim' ] , when: NetsimDevices is defined }
     - { role: setup-HA, tags: [ 'setup-HA' ] , when: SetupHA }
 ```
 
 ## Documentation
 
-Full documentation can be found on SCDP page of project: ```https://scdp.cisco.com/conf/pages/viewpage.action?pageId=78614444```
+Full documentation of aNSOble can be found on SCDP page of project: ```https://scdp.cisco.com/conf/pages/viewpage.action?pageId=78614444```
 
 ## Contacts
 
-Nicolas Fournier <nfournie@cisco.com>
-Michał Dobiecki <mdobieck@cisco.com>
-Sofia Athanasiou <sathanas@cisco.com>
-Sunpreetsingh Arora <sunparor@cisco.com>
+Nicolas Fournier <coangel@cisco.com>
