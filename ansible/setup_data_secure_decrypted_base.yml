@@ -5,11 +5,11 @@ ansible_become_password: 41Ciscoasps12#$
 
 #NEDs Repo Credentials
 NEDsRepoUser: coangel
-NEDsRepoPass: BigBuck$4IT
+NEDsRepoPass: Password
 
 #GIT User Access
 GITUser: coangel
-GITKeyPass: BigBuck$4IT
+GITKeyPass: Password
 
 #Vcenter for install
 vcenter_hostname: 172.18.176.27
