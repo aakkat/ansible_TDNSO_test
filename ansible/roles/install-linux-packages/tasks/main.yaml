@@ -2,6 +2,7 @@
   file: 
     path=/tmp/aNSOble.log 
     state=touch
+  become: yes
 
 - name: Wait for any possibly running unattended upgrade to finish
   raw: systemd-run --property="After=apt-daily.service apt-daily-upgrade.service" --wait /bin/true

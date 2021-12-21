@@ -5,15 +5,15 @@
     - setup_data.yml
     - setup_data_secure.yml
   roles:
-    # - { role: Ubuntu_vcenter_deploy, tags: [ 'install vm' ] , when: VM_INSTALL }
+    - { role: Ubuntu_vcenter_deploy, tags: [ 'install vm' ] , when: VM_INSTALL }
 - hosts: ubuntu
   vars_files:
     - setup_data.yml
     - setup_data_secure.yml
   roles:
-    # - { role: install-linux-packages, tags: [ 'install-linux-packages' ] }
-    # - { role: install-NSO, tags: [ 'install-NSO' ] , when: NSOInstallType is defined }
-    # - { role: install-NEDs, tags: [ 'install-NEDs' ] , when: NEDs is defined }
-    # - { role: install-repository-packages, tags: [ 'install-repository-packages' ] , when: remote_packages is defined}
-    # - { role: setup-netsim, tags: [ 'setup-netsim' ] , when: NetsimDevices is defined }
+    - { role: install-linux-packages, tags: [ 'install-linux-packages' ] }
+    - { role: install-NSO, tags: [ 'install-NSO' ] , when: NSOInstallType is defined }
+    - { role: install-NEDs, tags: [ 'install-NEDs' ] , when: NEDs is defined }
+    - { role: install-repository-packages, tags: [ 'install-repository-packages' ] , when: remote_packages is defined}
+    - { role: setup-netsim, tags: [ 'setup-netsim' ] , when: NetsimDevices is defined }
     - { role: setup-HA, tags: [ 'setup-HA' ] , when: SetupHA }

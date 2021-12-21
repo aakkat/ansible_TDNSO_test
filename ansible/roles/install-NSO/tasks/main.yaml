@@ -48,12 +48,14 @@
     dest: /tmp/NSO.bin
     mode: '740'
   when: NSOCopyType == 'local' and ncs_current_dir.stat.exists == False
+  become: yes
 
 - name: Unpack NSO install file
   shell: sh /tmp/NSO.bin >> /tmp/aNSOble.log 2>&1
   args:
     chdir: /tmp/
   when: ncs_current_dir.stat.exists == False
+  become: yes
 
 - name: Perfom NSO system install
   shell: eval "/tmp/$(sed -e s/\ /\\n/g aNSOble.log | grep bin | tail -1) --system-install --non-interactive" >> /tmp/aNSOble.log 2>&1
@@ -126,18 +128,20 @@
   template:
     src: authgroup.j2 
     dest: /home/{{ ansible_user }}/authgroup.xml
+  become: yes
 
 - name: Load default authgroup
   shell: ncs_load -l -m authgroup.xml >> /tmp/aNSOble.log 2>&1
   environment:
     PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
-
+  become: yes
 
 - name: Reboot immediately if there was a change.
   shell: "sleep 5 && reboot"
   async: 1
   poll: 0
   when: ncs_current_dir.stat.exists == False
+  become: yes
 
 - name: Wait for the reboot to complete if there was a change.
   wait_for_connection:
@@ -146,3 +150,4 @@
     delay: 5
     timeout: 300
   when: ncs_current_dir.stat.exists == False
+  become: yes

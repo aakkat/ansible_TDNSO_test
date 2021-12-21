@@ -1,3 +1,7 @@
+siteLibraryCopy Cisco_IOS-XR_Router_RTR-Template XR_RTR
+siteLibraryCopy Cisco_IOS-XR_Router_NDM-Template XR_NDM
+siteLibraryCopy Cisco_IOS-XE_Router_RTR-Template XE_ROUTER_RTR
+siteLibraryCopy Cisco_IOS-XE_Router_NDM-Template XE_ROUTER_NDM
 set devices authgroups group CARE
 set devices authgroups group CARE default-map remote-name coangel remote-password Sn0wB@ll1
 set devices device fws1-pe-1-a
