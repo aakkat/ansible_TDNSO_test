@@ -19,7 +19,7 @@ disk:
     unit_number: 0
     type: thin
 static_ip:
-  ipv4: 172.18.176.96
+  ipv4: 172.18.176.62
   netmask: 25
   gateway: 172.18.176.1
   dns_servers: [64.102.6.247, 8.8.4.4]

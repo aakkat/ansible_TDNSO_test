@@ -20,3 +20,7 @@
   become: true
   loop: "{{ linuxPackages }}"
   when: linuxPackages is defined
+
+- name: Install docker
+  include_tasks: docker_install.yaml
+  when: docker_install

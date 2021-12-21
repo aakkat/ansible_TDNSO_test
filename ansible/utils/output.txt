@@ -1,0 +1,62 @@
+set devices authgroups group CARE
+set devices authgroups group CARE default-map remote-name coangel remote-password Sn0wB@ll1
+set devices device fws1-pe-1-a
+set devices device fws1-pe-1-a authgroup CARE address 10.16.2.2 device-type cli ned-id cisco-iosxr-cli-7.33
+set devices device fws1-pe-1-a state admin-state unlocked
+commit
+request devices device fws1-pe-1-a ssh fetch-host-keys
+request devices device fws1-pe-1-a sync-from
+set devices device fws1-pe-1-b
+set devices device fws1-pe-1-b authgroup CARE address 10.16.2.3 device-type cli ned-id cisco-iosxr-cli-7.33
+set devices device fws1-pe-1-b state admin-state unlocked
+commit
+request devices device fws1-pe-1-b ssh fetch-host-keys
+request devices device fws1-pe-1-b sync-from
+set devices device fws2-pe-1-a
+set devices device fws2-pe-1-a authgroup CARE address 10.16.2.66 device-type cli ned-id cisco-iosxr-cli-7.33
+set devices device fws2-pe-1-a state admin-state unlocked
+commit
+request devices device fws2-pe-1-a ssh fetch-host-keys
+request devices device fws2-pe-1-a sync-from
+set devices device fws2-pe-1-b
+set devices device fws2-pe-1-b authgroup CARE address 10.16.2.67 device-type cli ned-id cisco-iosxr-cli-7.33
+set devices device fws2-pe-1-b state admin-state unlocked
+commit
+request devices device fws2-pe-1-b ssh fetch-host-keys
+request devices device fws2-pe-1-b sync-from
+set devices device fws3-pe-1-a
+set devices device fws3-pe-1-a authgroup CARE address 10.16.2.130 device-type cli ned-id cisco-iosxr-cli-7.33
+set devices device fws3-pe-1-a state admin-state unlocked
+commit
+request devices device fws3-pe-1-a ssh fetch-host-keys
+request devices device fws3-pe-1-a sync-from
+set devices device fws3-pe-1-b
+set devices device fws3-pe-1-b authgroup CARE address 10.16.2.131 device-type cli ned-id cisco-iosxr-cli-7.33
+set devices device fws3-pe-1-b state admin-state unlocked
+commit
+request devices device fws3-pe-1-b ssh fetch-host-keys
+request devices device fws3-pe-1-b sync-from
+set devices device bb1-pe-1-a
+set devices device bb1-pe-1-a authgroup CARE address 100.1.1.12 device-type cli ned-id cisco-iosxr-cli-7.33
+set devices device bb1-pe-1-a state admin-state unlocked
+commit
+request devices device bb1-pe-1-a ssh fetch-host-keys
+request devices device bb1-pe-1-a sync-from
+set devices device bb1-pe-1-b
+set devices device bb1-pe-1-b authgroup CARE address 100.1.1.11 device-type cli ned-id cisco-iosxr-cli-7.33
+set devices device bb1-pe-1-b state admin-state unlocked
+commit
+request devices device bb1-pe-1-b ssh fetch-host-keys
+request devices device bb1-pe-1-b sync-from
+set devices device bb1-p-1-a
+set devices device bb1-p-1-a authgroup CARE address 100.1.1.10 device-type cli ned-id cisco-iosxr-cli-7.33
+set devices device bb1-p-1-a state admin-state unlocked
+commit
+request devices device bb1-p-1-a ssh fetch-host-keys
+request devices device bb1-p-1-a sync-from
+set devices device bb1-p-1-b
+set devices device bb1-p-1-b authgroup CARE address 100.1.1.9 device-type cli ned-id cisco-iosxr-cli-7.33
+set devices device bb1-p-1-b state admin-state unlocked
+commit
+request devices device bb1-p-1-b ssh fetch-host-keys
+request devices device bb1-p-1-b sync-from
