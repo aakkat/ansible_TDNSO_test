@@ -1,0 +1,28 @@
+
+ - name: Running block for backup
+   block:
+    - name: Run ncs-backup command
+      shell: ncs-backup 
+      register: out1
+      ignore_errors: true
+    - debug:
+        msg: "{{out1.stdout}}"
+    - shell: echo "{{out1.stdout}}" | awk '{print $3}'
+      register: out2
+    - set_fact:
+          Backup_file: "{{out2.stdout}}"
+    - debug:
+          msg: "Backup file is {{Backup_file}}"
+   when: ( mode == 'backup' )
+
+ - name: Running block for restore
+   block:
+      - name: Stop NCS process to run restore
+        shell: 
+      - name: run restore command
+        shell:  ncs-backup --restore {{Backup_file}}
+        register: out3
+        ignore_errors: true
+      - debug:
+          msg: "{{out3.stdout}}"
+   when: ( mode == 'restore' )       
