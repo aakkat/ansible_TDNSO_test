@@ -1,7 +1,8 @@
 - hosts: all
   vars_files:
-    - "{{ setup_data }}"
-    - "{{setup_data_secure }}"
+    - setup_data.yml
+  environment:
+        PATH: "{{ ansible_env.PATH }}:/opt/ncs/current/bin" 
   roles:
     - { role: install-linux-packages, tags: [ 'install-linux-packages' ] }
     - { role: install-NSO, tags: [ 'install-NSO' ] , when: NSOInstallType is defined }
