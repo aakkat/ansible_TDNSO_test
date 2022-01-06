@@ -106,7 +106,7 @@
     dest: /home/{{ ansible_user }}/authgroup.xml
 
 - name: Load default authgroup
-  shell: ncs_load -l -m authgroup.xml >> /tmp/aNSOble.log 2>&1
+  shell: ncs_load -l -m /home/{{ ansible_user }}/authgroup.xml >> /tmp/aNSOble.log 2>&1
   environment:
     PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
 
