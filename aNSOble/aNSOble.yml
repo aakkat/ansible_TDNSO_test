@@ -1,6 +1,8 @@
 - hosts: all
   vars_files:
     - setup_data.yml
+  vars:
+    mode: "{{mode}}"
   environment:
         PATH: "{{ ansible_env.PATH }}:/opt/ncs/current/bin" 
   roles:
