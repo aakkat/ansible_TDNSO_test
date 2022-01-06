@@ -6,7 +6,7 @@ VM_INSTALL: true
 docker_install: true
 #List of linux packages to install
 #This is a common base for Ubuntu:
-linuxPackages: ['git', 'make', 'wget', 'python-minimal', 'openjdk-8-jdk', 'ant', 'xsltproc', 'iputils-arping'] 
+linuxPackages: ['git', 'make', 'wget', 'python-minimal', 'openjdk-8-jdk', 'ant', 'xsltproc', 'iputils-arping', 'netplan.io'] 
 #This is a common base for CentOS/RHEL:
 #linuxPackages: ['git', 'make', 'wget', 'python2', 'java', 'ant', 'libxslt', 'iputils'] 
 
