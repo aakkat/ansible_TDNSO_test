@@ -1,5 +1,5 @@
  - name: determine NSO version
-   shell: sudo su - "{{ansible_user}}" -c  'ncs --version'
+   shell:  ncs --version
    register: out1
  - shell: echo "{{out1.stdout}}" | cut -c1-3
    register: out2
@@ -16,7 +16,7 @@
  - name: check for disable mode and disable HA if its enabled
    block:
     - name: HA status
-      shell: sudo su - "{{ansible_user}}" -c 'echo "show ncs-state ha" | ncs_cli -C'
+      shell:  echo "show ncs-state ha" | ncs_cli -C
       register: out3
       ignore_errors: true
     - debug:
@@ -28,7 +28,7 @@
     - block:
       - name: run HA disable commands
         shell: |
-          sudo su - "{{ansible_user}}" -c ' echo "{{HA_CMD}} be-none" | ncs_cli -C ; echo "{{HA_CMD}} disable"  | ncs_cli -C'
+           echo "{{HA_CMD}} be-none" | ncs_cli -C ; echo "{{HA_CMD}} disable"  | ncs_cli -C
         register: out4
       - debug:
            msg: "{{out4.stdout}}"
@@ -38,7 +38,7 @@
  - name: Check for enable mode and enable HA if its disabled
    block:
       - name: HA status
-        shell: sudo su - "{{ansible_user}}" -c 'echo "show ncs-state ha" | ncs_cli -C'
+        shell:  echo "show ncs-state ha" | ncs_cli -C
         register: out5
         ignore_errors: true
       - debug:
@@ -49,7 +49,7 @@
         when: ( 'ncs-state ha mode none' not in out5.stdout )
       - block:
         - name: list master and secondary servers using show running-config {{HA_CMD}}
-          shell: sudo su - "{{ansible_user}}" -c 'echo "show running-config {{HA_CMD}}" | ncs_cli -C | egrep "address"'
+          shell:  echo "show running-config {{HA_CMD}}" | ncs_cli -C | egrep "address"
           register: out6
         - debug:
             msg: "{{out6.stdout_lines}}"
@@ -69,15 +69,15 @@
                - "secondary is {{secondary}}"
         - name: run HA enable commands
           shell: |
-             sudo su - "{{ansible_user}}" -c 'echo "{{HA_CMD}} enable" | ncs_cli -C'
+              echo "{{HA_CMD}} enable" | ncs_cli -C
         - name: Run to be master command
-          shell: sudo su - "{{ansible_user}}" -c 'echo "{{HA_CMD}} be-master" | ncs_cli -C'
+          shell:  echo "{{HA_CMD}} be-master" | ncs_cli -C
           when: ( master|trim in ansible_host )
         - name: Run to be slave command
-          shell: sudo su - "{{ansible_user}}" -c 'echo "{{HA_CMD}} be-slave-to node master" | ncs_cli -C'
+          shell:  echo "{{HA_CMD}} be-slave-to node master" | ncs_cli -C
           when: ( secondary|trim in ansible_host )
         - name: confirm HA state
-          shell: sudo su - "{{ansible_user}}" -c 'echo "show ncs-state ha" | ncs_cli -C'
+          shell:  echo "show ncs-state ha" | ncs_cli -C
           register: out8
         - debug:
             msg: "{{out8.stdout}}"
