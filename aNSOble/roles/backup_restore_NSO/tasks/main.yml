@@ -4,7 +4,6 @@
     - name: Run ncs-backup command
       shell: ncs-backup 
       register: out1
-      ignore_errors: true
     - debug:
         msg: "{{out1.stdout}}"
     - shell: echo "{{out1.stdout}}" | awk '{print $3}'
@@ -18,11 +17,20 @@
  - name: Running block for restore
    block:
       - name: Stop NCS process to run restore
-        shell: 
-      - name: run restore command
-        shell:  ncs-backup --restore {{Backup_file}}
+        shell: ncs --stop >> /tmp/aNSOble.log
+        environment:
+              PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
+        ignore_errors: yes
+        become: true
+      - name: Pick the latest Backup file, Please restore manually in case of particular backup file restoration
+        shell: ls -rt /var/opt/ncs/backups/ | tail -n 1
         register: out3
+      - set_fact:
+             Backup_file: "{{out3.stdout}}"
+      - name: run restore command
+        shell:  yes | ncs-backup --restore {{Backup_file}}
+        register: out4
         ignore_errors: true
       - debug:
-          msg: "{{out3.stdout}}"
+          msg: "{{out4.stdout}}"
    when: ( mode == 'restore' )       
