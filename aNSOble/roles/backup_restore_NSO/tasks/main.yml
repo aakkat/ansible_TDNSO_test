@@ -33,4 +33,9 @@
         ignore_errors: true
       - debug:
           msg: "{{out4.stdout}}"
+      - name: Start NSO service
+        shell: |
+           source /etc/profile.d/ncs.sh
+           /etc/init.d/ncs start >> /tmp/aNSOble.log 2>&1
+        become: true
    when: ( mode == 'restore' )       
