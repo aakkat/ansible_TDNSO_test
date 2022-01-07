@@ -30,6 +30,7 @@
         shell: |
            echo "{{HA_CMD}} be-none" | ncs_cli -C ; echo "{{HA_CMD}} disable"  | ncs_cli -C
         register: out4
+        become: true
       - debug:
            msg: "{{out4.stdout}}"
       when: ( 'ncs-state ha mode none' not in out3.stdout )
@@ -70,11 +71,14 @@
         - name: run HA enable commands
           shell: |
               echo "{{HA_CMD}} enable" | ncs_cli -C
+          become: true
         - name: Run to be master command
           shell:  echo "{{HA_CMD}} be-master" | ncs_cli -C
+          become: true
           when: ( master|trim in ansible_host )
         - name: Run to be slave command
           shell:  echo "{{HA_CMD}} be-slave-to node master" | ncs_cli -C
+          become: true
           when: ( secondary|trim in ansible_host )
         - name: confirm HA state
           shell:  echo "show ncs-state ha" | ncs_cli -C
