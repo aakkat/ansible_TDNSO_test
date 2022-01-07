@@ -1,9 +1,9 @@
-
  - name: Running block for backup
    block:
     - name: Run ncs-backup command
       shell: ncs-backup 
       register: out1
+      become: true
     - debug:
         msg: "{{out1.stdout}}"
     - shell: echo "{{out1.stdout}}" | awk '{print $3}'
@@ -31,6 +31,7 @@
         shell:  yes | ncs-backup --restore {{Backup_file}}
         register: out4
         ignore_errors: true
+        become: true
       - debug:
           msg: "{{out4.stdout}}"
       - name: Start NSO service
@@ -38,4 +39,4 @@
            source /etc/profile.d/ncs.sh
            /etc/init.d/ncs start >> /tmp/aNSOble.log 2>&1
         become: true
-   when: ( mode == 'restore' )       
+   when: ( mode == 'restore' ) 
