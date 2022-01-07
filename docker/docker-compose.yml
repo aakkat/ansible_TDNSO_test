@@ -7,7 +7,7 @@ services:
     networks:
       - main
     volumes:
-      - ./ansible:/etc/ansible
+      - ../ansible:/etc/ansible
     environment:
       - DEBUG=true
     tty: true
