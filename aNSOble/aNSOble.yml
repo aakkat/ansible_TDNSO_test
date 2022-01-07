@@ -1,7 +1,10 @@
 - hosts: all
+  vars:
+     mode: "{{mode}}"
   vars_files:
-    - "{{ setup_data }}"
-    - "{{setup_data_secure }}"
+    - setup_data.yml
+  environment:
+        PATH: "{{ ansible_env.PATH }}:/opt/ncs/current/bin" 
   roles:
     - { role: install-linux-packages, tags: [ 'install-linux-packages' ] }
     - { role: install-NSO, tags: [ 'install-NSO' ] , when: NSOInstallType is defined }
@@ -10,3 +13,6 @@
     - { role: setup-netsim, tags: [ 'setup-netsim' ] , when: NetsimDevices is defined }
     - { role: setup-HA, tags: [ 'setup-HA' ] , when: SetupHA }
     - { role: data_collector, tags: [ 'data_collector' ] }
+    - { role: device_check_sync_from, tags: [ 'device_check_sync_from' ] }
+    - { role: enable_disable_HA, tags: [ 'enable_disable_HA' ] }
+    - { role: backup_restore_NSO, tags: [ 'backup_restore_NSO' ] }

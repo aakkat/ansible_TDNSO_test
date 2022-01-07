@@ -1,0 +1,22 @@
+      - name: determine NSO version
+        shell:  ncs --version
+        register: output
+      - set_fact:
+             ncs_ver: "{{output.stdout}}"
+      - name: Stop NSO
+        shell: ncs --stop >> /tmp/aNSOble.log
+        environment:
+              PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
+        ignore_errors: yes
+        become: true
+      - name: Run CDB compact command
+        shell: /opt/ncs/ncs-{{ncs_ver}}/bin/ncs --cdb-compact /var/opt/ncs/cdb/
+        register: out1
+        become: true
+      - debug:
+          msg: "{{out1.stdout}}"
+      - name: Start NSO service
+        shell: |
+           source /etc/profile.d/ncs.sh
+           /etc/init.d/ncs start >> /tmp/aNSOble.log 2>&1
+        become: true

@@ -1,6 +1,6 @@
 ## Enter Parent LOG Directory path where you want to save logs of NSO server and APP. logs_$hostname directory would be created under this parent directory.
 LOG_DIR: "/tmp"
-
+ansible_user: nsoadmin
 
 #List of linux packages to install
 #This is a common base for Ubuntu:
@@ -21,7 +21,7 @@ NSOImageLocation: /Users/nfournie/Downloads/nso-5.3.2.2.linux.x86_64.signed.bin
 NSOInstallType: system
 
 #List of users to add to ncsadmin group
-ncsadminUsers: ['cisco']
+ncsadminUsers: ['cisco','nsoadmin']
 
 #List of users to add to the ncsoper group
 #ncsoperUsers: ['test']
