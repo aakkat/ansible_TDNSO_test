@@ -68,7 +68,7 @@ The content of the aNSOble.yml file is the following:
 
 ## Documentation
 
-Full documentation can be found on SCDP page of project: ```https://scdp.cisco.com/conf/pages/viewpage.action?pageId=78614444````
+Full documentation can be found on SCDP page of project: ```https://scdp.cisco.com/conf/pages/viewpage.action?pageId=78614444```
 
 ## Contacts
 
