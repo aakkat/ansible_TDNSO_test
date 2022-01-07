@@ -5,9 +5,6 @@
   register: ping
   ignore_errors: yes
 
-- name: get rid of keys to avoid errors
-  shell: echo "" > ~/.ssh/known_hosts
-  connection: local
   
 - name: Creates directory
   file:
@@ -30,6 +27,7 @@
     password: "{{ vcenter_password | default(omit) }}"
     validate_certs: "{{ vcenter_validate_certs | default(omit) }}"
     datacenter: "{{ vmware_datacenter }}"
+    esxi_hostname: "{{ esxi_hostname }}"
     datastore: "{{ vmware_datastore }}"
     folder: "{{ vmware_folder | default(omit) }}"
     resource_pool: "{{ vmware_resource_pool | default(omit) }}"
