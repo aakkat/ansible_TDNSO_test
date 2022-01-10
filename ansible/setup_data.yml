@@ -1,3 +1,7 @@
+## Enter Parent LOG Directory path where you want to save logs of NSO server and APP. logs_$hostname directory would be created under this parent directory.
+LOG_DIR: "/tmp"
+ansible_user: nsoadmin
+
 # Install Ubuntu 18.04 onto virtual machine
 # Vcenter credentials must be present in the secure setup and host vars 
 # Must be present for the desired setup, see example.txt in host vars
