@@ -1,10 +1,13 @@
 
- - name: filter out all the devices
-   shell: echo "show devices brief" | ncs_cli -C | awk -F ' ' '{print $1}' | awk -F '---' '{print $1}' | grep -v NAME | grep -v ^$
-   register: output
- - name: Run device check sync and sync from commands
+ - name: Run device check sync command
    shell: |
-      echo "devices device {{item}} check-sync" | ncs_cli -C 
-      echo "devices device {{item}} sync-from" | ncs_cli -C
-   with_items:
-         - "{{output.stdout_lines}}"
+      echo "devices device {{device}} check-sync" | ncs_cli -C 
+   register: out1
+ - debug:
+      msg: "{{out1.stdout}}"
+ - name: Run device sync from command
+   shell: |
+      echo "devices device {{device}} sync-from" | ncs_cli -C
+   register: out2
+ - debug:
+      msg: "{{out2.stdout}}"

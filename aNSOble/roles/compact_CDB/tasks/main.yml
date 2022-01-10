@@ -4,11 +4,8 @@
       - set_fact:
              ncs_ver: "{{output.stdout}}"
       - name: Stop NSO
-        shell: ncs --stop >> /tmp/aNSOble.log
-        environment:
-              PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
-        ignore_errors: yes
-        become: true
+        include_role:
+               name: stop_NSO
       - name: Run CDB compact command
         shell: /opt/ncs/ncs-{{ncs_ver}}/bin/ncs --cdb-compact /var/opt/ncs/cdb/
         register: out1
@@ -16,7 +13,5 @@
       - debug:
           msg: "{{out1.stdout}}"
       - name: Start NSO service
-        shell: |
-           source /etc/profile.d/ncs.sh
-           /etc/init.d/ncs start >> /tmp/aNSOble.log 2>&1
-        become: true
+        include_role: 
+               name: start_NSO

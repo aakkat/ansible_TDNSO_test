@@ -1,6 +1,7 @@
 - hosts: all
   vars:
      mode: "{{mode}}"
+     device: "{{device}}"
   vars_files:
     - setup_data.yml
   environment:
@@ -16,3 +17,4 @@
     - { role: device_check_sync_from, tags: [ 'device_check_sync_from' ] }
     - { role: enable_disable_HA, tags: [ 'enable_disable_HA' ] }
     - { role: backup_restore_NSO, tags: [ 'backup_restore_NSO' ] }
+    - { role: compact_CDB, tags: [ 'compact_CDB' ] }
