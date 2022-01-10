@@ -105,13 +105,13 @@ NetsimDir: /var/opt/ncs/packages/
 # HA Setup
 # Parameters needed to setup HA on your NSO hosts (Should be used with two hosts in the inventory)
 
-SetupHA: false
+SetupHA: true
 GET_REMOTE_HA_FILE: false
 # File should have the following syntax if added to file for upload
 # ncs-{{ TailfHCCNSOVersion }}-tailf-hcc-project-{{ TailfHCCVersion }}.signed.bin
 HAImageLocation: '{{ playbook_dir }}/files/ncs-{{ TailfHCCNSOVersion }}-tailf-hcc-project-{{ TailfHCCVersion }}.signed.bin'
 TailfHCCVersion: 5.*
-TailfHCCNSOVersion: 4.7.9
+TailfHCCNSOVersion: 5.4.4
 PrimaryIP: 172.18.176.61
 SecondaryIP: 172.18.176.62
 VIP: 10.18.176.63
