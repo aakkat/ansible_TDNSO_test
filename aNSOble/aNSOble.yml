@@ -1,4 +1,4 @@
-- hosts: NSO
+- hosts: all
   vars:
      mode: "{{mode}}"
      device: "{{device}}"
