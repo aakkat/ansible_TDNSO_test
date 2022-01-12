@@ -62,6 +62,12 @@
                register: output
              - debug:
                   msg: "{{output.stdout_lines}}"
+             - name: Write results to logfile {{LOG_DIRR}}/log_linux_lib_{{DATE}}.txt
+               block:
+                - copy:
+                     content:  "{{output.stdout}}"
+                     dest: "{{LOG_DIRR}}/log_linux_lib_{{DATE}}.txt"
+               delegate_to: localhost
           when: "'x86_64' not in out3.stdout"
         - name: get linux lib for centos/RHEL
           block:
@@ -69,25 +75,54 @@
                register: output
              - debug:
                   msg: "{{output.stdout_lines}}"
+             - name: Write results to logfile {{LOG_DIRR}}/log_linux_lib_{{DATE}}.txt
+               block:
+                - copy:
+                    content:  "{{output.stdout}}"
+                    dest: "{{LOG_DIRR}}/log_linux_lib_{{DATE}}.txt"
+               delegate_to: localhost
           when: "'x86_64' in out3.stdout"
-        - name: Write results to logfile {{LOG_DIRR}}/log_linux_lib_{{DATE}}.txt
-          block:
-            - copy:
-                 content:  "{{output.stdout}}"
-                 dest: "{{LOG_DIRR}}/log_linux_lib_{{DATE}}.txt"
-          delegate_to: localhost
-        - name: get python lib
-          shell: pip list
-          register: output
-        - debug:
-             msg: "{{output.stdout_lines}}"
-        - name: Write results to logfile {{LOG_DIRR}}/log_python_lib_{{DATE}}.txt
-          block:
+        - name: check if pip is installed or not
+          shell: pip --version
+          register: pip_out
+          ignore_errors: true
+        - block:
+           - shell: pip3 --version
+             register: pip3_out
+             ignore_errors: true
+           - name: Write results to logfile {{LOG_DIRR}}/log_python_lib_{{DATE}}.txt
+             block:
               - copy:
-                 content:  "{{output.stdout}}"
+                 content:  "{{pip3_out.stderr}}"
                  dest: "{{LOG_DIRR}}/log_python_lib_{{DATE}}.txt"
-          delegate_to: localhost
-
+             delegate_to: localhost
+             when: ( 'not found' in pip3_out.stderr )
+           - name: Write results to logfile {{LOG_DIRR}}/log_python_lib_{{DATE}}.txt
+             block:
+              - shell: pip3 list
+                register: pip3_list
+              - debug:
+                   msg: "{{pip3_list.stdout}}"
+              - copy:
+                 content:  "{{pip3_list.stdout}}"
+                 dest: "{{LOG_DIRR}}/log_python_lib_{{DATE}}.txt"
+                delegate_to: localhost
+             when: ( 'not found' not in pip3_out.stderr )
+          when: ( 'not found' in pip_out.stderr )
+        - block:
+           - name: get python lib
+             shell: pip list
+             register: output
+           - debug:
+                msg: "{{output.stdout_lines}}"
+           - name: Write results to logfile {{LOG_DIRR}}/log_python_lib_{{DATE}}.txt
+             block:
+               - copy:
+                   content:  "{{output.stdout}}"
+                   dest: "{{LOG_DIRR}}/log_python_lib_{{DATE}}.txt"
+             delegate_to: localhost
+          when: ( 'not found' not in pip_out.stderr )
+      
         - name: HA state status
           shell: echo "show ncs-state ha | display xml" | ncs_cli -C
           register: output

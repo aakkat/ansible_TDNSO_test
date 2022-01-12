@@ -1,13 +1,13 @@
-      - name: determine NSO version
-        shell:  ncs --version
-        register: output
-      - set_fact:
-             ncs_ver: "{{output.stdout}}"
       - name: Stop NSO
         include_role:
                name: stop_NSO
+      - name: Fetch NCS_DIR
+        shell: /bin/bash -l -c 'env' | grep NCS_DIR | awk -F "=" '{print $2}'
+        register: NCS_DIR
+      - set_fact:
+              NCS_DIR: "{{NCS_DIR.stdout}}"
       - name: Run CDB compact command
-        shell: /opt/ncs/ncs-{{ncs_ver}}/bin/ncs --cdb-compact /var/opt/ncs/cdb/
+        shell: {{NCS_DIR}}/bin/ncs --cdb-compact {{CDB_DIR}}
         register: out1
         become: true
       - debug:
