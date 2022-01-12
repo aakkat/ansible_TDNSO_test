@@ -3,6 +3,7 @@
      mode: "{{mode}}"
      device: "{{device}}"
      config: "{{config}}"
+     NEW_NEDs: "{{NEW_NEDs}}"
   vars_files:
     - setup_data.yml
     - setup_data_secure.yml
@@ -22,3 +23,4 @@
     - { role: compact_CDB, tags: [ 'compact_CDB' ] }
     - { role: device_migration, tags: [ 'device_migration' ] }
     - { role: config_NSO, tags: [ 'config_NSO' ] }
+    - { role: copy_master_to_slave, tags: [ 'copy_master_to_slave' ] }
