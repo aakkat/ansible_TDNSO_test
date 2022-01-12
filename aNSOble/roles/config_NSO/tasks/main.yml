@@ -7,4 +7,5 @@
     shell: ncs_load -l -m ~/config.xml >> /tmp/aNSOble.log 2>&1
     environment:
        PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
+    become: true
 
