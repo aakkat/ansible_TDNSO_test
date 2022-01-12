@@ -1,4 +1,8 @@
-
+- name: set logfile permissions
+  file:
+    path: /tmp/aNSOble.log
+    mode: 0777
+  become: yes
 - name: Create NSO admin group
   group:
     name: ncsadmin

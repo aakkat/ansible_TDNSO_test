@@ -1,3 +1,8 @@
+- name: set logfile permissions
+  file:
+    path: /tmp/aNSOble.log
+    mode: 0777
+  become: yes
 - name: Copy NED install file (Local copy)
   copy:
     src: "{{ NEDfileLocation }}/ncs-{{ item.targetNsoVersion }}-{{ item.name }}-{{ item.version }}.signed.bin" 
@@ -22,6 +27,7 @@
     chdir: /tmp/
     warn: false
   loop: "{{ NEDs }}"
+  become: yes
 
 - name: Unpacking NEDs into /var/opt/ncs/packages 
   shell: tar zxvf ncs-{{ item.targetNsoVersion }}-{{ item.name }}-{{ item.version }}.tar.gz -C /var/opt/ncs/packages >> /tmp/aNSOble.log 2>&1
@@ -29,6 +35,7 @@
     chdir: /tmp/
     warn: false
   loop: "{{ NEDs }}"
+  become: yes
 
 - name: Resource manager special handling
   shell: |
@@ -39,6 +46,7 @@
     warn: false
   when: item.name == 'resource-manager-project' 
   loop: "{{ NEDs }}"
+  become: yes
 
 - name: Reloading NSO packages
   shell: |
@@ -46,3 +54,4 @@
     echo 'packages reload' | ncs_cli -C -u {{ ansible_user }} >> /tmp/aNSOble.log 2>&1
   environment:
     PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}    
+  become: yes

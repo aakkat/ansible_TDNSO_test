@@ -1,9 +1,15 @@
+- name: set logfile permissions
+  file:
+    path: /tmp/aNSOble.log
+    mode: 0777
+  become: yes
 - name: Copy package files (Local copy)
   copy:
     src: "{{ playbook_dir }}/files/packages/"
     dest: /var/opt/ncs/packages/
     mode: '740'
   when: remote_packages == False
+  become: yes
 
 - name: Cloning the {{ RepositoryBranch }} branch of the repository to /tmp/repo directory
   git:
@@ -12,6 +18,7 @@
     version: "{{ RepositoryBranch }}"
     force: yes
   when: remote_packages == True
+  become: yes
 
 - name: Copy NSO service packages to /var/opt/ncs/packages
   shell: cp -r repo/{{ ServicePackagesPath }}/{{ item.name }}/ /var/opt/ncs/packages/ >> /tmp/aNSOble.log 2>&1
@@ -20,6 +27,7 @@
     warn: false
   loop: "{{ Packages }}"
   when: remote_packages == True
+  become: yes
 
 - name: Compiling the packages 
   shell: make clean all -C {{ item.name }}/src/ >> /tmp/aNSOble.log 2>&1
@@ -36,6 +44,7 @@
     echo 'packages reload' | ncs_cli -C -u {{ ansible_user }} >> /tmp/aNSOble.log 2>&1
   environment:
     PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
+  become: yes
 
 - name: Copy NSO initial config file
   copy:
@@ -49,3 +58,4 @@
   environment:
     PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
   when: remote_packages == True and NSOInitialConfigLocation is defined  
+  become: yes
