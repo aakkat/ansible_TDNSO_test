@@ -6,7 +6,6 @@
      NEW_NEDs: "{{NEW_NEDs}}"
   vars_files:
     - setup_data.yml
-    - setup_data_secure.yml
   environment:
         PATH: "{{ ansible_env.PATH }}:/opt/ncs/current/bin" 
   roles:
