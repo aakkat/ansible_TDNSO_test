@@ -7,7 +7,7 @@
       - set_fact:
               NCS_DIR: "{{NCS_DIR.stdout}}"
       - name: Run CDB compact command
-        shell: "{{NCS_DIR}}"/bin/ncs --cdb-compact "{{CDB_DIR}}"
+        shell: {{NCS_DIR}}/bin/ncs --cdb-compact {{CDB_DIR}}
         register: out1
         become: true
       - debug:
