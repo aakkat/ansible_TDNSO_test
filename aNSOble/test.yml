@@ -6,5 +6,7 @@
           register: user
         - debug:
              msg: "Logged in user is {{user.stdout}}"   
-       tags: mytag       
-     - { role: data_collector, tags: [ 'data_collector' ] }
+       tags: mytag  
+     - include_role:
+            name: data_collector
+       tags: data_collector     
