@@ -1,8 +1,10 @@
 ---
  - hosts: all
    tasks:
-     - shell: whoami
-       register: user
-     - debug:
-           msg: "Logged in user is {{user.stdout}}"   
+     - block:         
+        - shell: whoami
+          register: user
+        - debug:
+             msg: "Logged in user is {{user.stdout}}"   
+       tags: mytag       
      - { role: data_collector, tags: [ 'data_collector' ] }
