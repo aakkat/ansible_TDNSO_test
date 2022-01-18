@@ -1,12 +1,8 @@
 ---
  - hosts: all
-   tasks:
-     - block:         
-        - shell: whoami
-          register: user
-        - debug:
-             msg: "Logged in user is {{user.stdout}}"   
-       tags: mytag  
-     - include_role:
-            name: data_collector
-       tags: data_collector     
+   vars_files:
+    - setup_data.yml
+   environment:
+        PATH: "{{ ansible_env.PATH }}:/opt/ncs/current/bin"
+   roles:
+     - { role: data_collector, tags: [ 'data_collector' ] }       
