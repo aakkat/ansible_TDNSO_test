@@ -4,6 +4,7 @@
     state: touch
     mode: 0777
   become: yes
+
 - name: Copy package files (Local copy)
   copy:
     src: "{{ playbook_dir }}/files/packages/"
@@ -11,6 +12,76 @@
     mode: '740'
   when: remote_packages == False
   become: yes
+
+- name: get list of all bin files
+  find:
+    paths: /var/opt/ncs/packages/
+    patterns: "^.*?\\.(?:bin)$"
+    use_regex: true
+  register: bin_files
+  when:  remote_packages == false
+
+- name: set logfile permissions
+  file:
+    path: /tmp/package_unload/
+    state: directory
+    mode: 0777
+  become: yes
+
+- name: extract local bin files
+  shell: "{{item.path}}"
+  args:
+    chdir: /tmp/package_unload/
+    warn: false
+  loop: "{{ bin_files.files }}"
+  when: remote_packages == false
+  become: yes
+
+- name: get list of all tar files
+  find:
+    paths: /tmp/package_unload/
+    patterns: "^.*?\\.(?:tar|tar\\.gz)$"
+    use_regex: true
+  register: tar_files
+  when:  remote_packages == false
+
+- name: extract tar local to packages
+  shell: "tar -xzvf {{item.path}} -C /var/opt/ncs/packages/"
+  loop: "{{ tar_files.files }}"
+  when: remote_packages == false
+  become: yes
+
+- name: Find /var/opt/ncs/packages/ all directories, exclude nginx and mysql
+  find:
+    paths: /var/opt/ncs/packages/
+    recurse: no
+    patterns: '{{ compiled_packages }}'
+    use_regex: true
+    file_type: directory
+  register: package_directories
+
+- debug:
+    var: package_directories
+- name: set package permissions
+  file:
+    path: "{{ item.path }}"
+    recurse: yes
+    state: directory
+    owner: ciscoadmin
+    group: ncsadmin
+  loop: "{{ package_directories.files }}"
+  when: remote_packages == false
+  become: yes
+
+- name: compile specified local packages
+  shell: make clean all
+  args:
+    chdir: "{{ item.path }}/src/"
+    warn: false
+  environment:
+    NCS_DIR: /opt/ncs/current
+  loop: "{{ package_directories.files }}"
+  when: remote_packages == false
 
 - name: Cloning the {{ RepositoryBranch }} branch of the repository to /tmp/repo directory
   git:

@@ -48,7 +48,7 @@ DfltAuthPass: admin
 # vars file for nso_install
 # nso_install_dir: NSO_FILES
 # nso_run_dir: ncs-run
-nso_installer_name: nso-5.4.5.2.linux.x86_64.signed.bin
+nso_installer_name: nso-4.7.9.linux.x86_64.signed.bin
 # nso_java_opts: -Xmx2G -Xms1G
 # nso_package_list: 
 #     - ncs-5.4.4-cisco-ios-6.74.5.signed.bin
@@ -56,16 +56,16 @@ nso_installer_name: nso-5.4.5.2.linux.x86_64.signed.bin
 #     - ncs-5.4.4-cisco-nx-5.21.17.signed.bin
 
 #List of NEDs to load
-NEDs:
-  - name: cisco-ios
-    version: 6.74.5
-    targetNsoVersion: 5.4.4
-  - name: cisco-nx
-    version: 5.21.17
-    targetNsoVersion: 5.4.4
-  - name: cisco-iosxr
-    version: 7.33.20
-    targetNsoVersion: 5.4.4
+# NEDs:
+#   - name: cisco-ios
+#     version: 6.74.5
+#     targetNsoVersion: 5.4.4
+#   - name: cisco-nx
+#     version: 5.21.17
+#     targetNsoVersion: 5.4.4
+#   - name: cisco-iosxr
+#     version: 7.33.20
+#     targetNsoVersion: 5.4.4
   # - name: cisco-asa
   #   version: 6.10.2
   #   targetNsoVersion: 5.4.4
@@ -78,6 +78,8 @@ remote_packages: False
 #Repository Data
 #Set needsCompiling to true if you wish your package to be compiled after the import.
 #Omit RepositoryURL if you don't want to install any service packages from a repository
+#A list of regex for local packages that need compilation, set to .* for no compiling
+compiled_packages: [".*iosxr.*"]
 # RepositoryURL: wwwin-github.cisco.com/AS-Customer/Test-Nico-Interface-Project.git
 RepositoryBranch: master
 ServicePackagesPath: packages
@@ -113,7 +115,7 @@ GET_REMOTE_HA_FILE: false
 HAImageLocation: '{{ playbook_dir }}/files/ncs-{{ TailfHCCNSOVersion }}-tailf-hcc-project-{{ TailfHCCVersion }}.signed.bin'
 TailfHCCVersion: 5.*
 TailfHCCNSOVersion: 5.4.4
-PrimaryIP: 172.18.176.42
+PrimaryIP: 172.18.176.100
 SecondaryIP: 172.18.176.43
 VIP: 10.18.176.44
 # VIPNetMask: 255.255.255.128

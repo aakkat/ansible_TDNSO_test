@@ -5,7 +5,7 @@
     - setup_data.yml
     - setup_data_secure.yml
   roles:
-    - { role: Ubuntu_vcenter_deploy, tags: [ 'install vm' ] , when: VM_INSTALL }
+    - { role: Ubuntu_vcenter_deploy, tags: [ 'install-vm' ] , when: VM_INSTALL }
 - hosts: ubuntu
   vars_files:
     - setup_data.yml
