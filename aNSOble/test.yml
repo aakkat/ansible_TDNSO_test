@@ -5,3 +5,4 @@
        register: user
      - debug:
            msg: "Logged in user is {{user.stdout}}"   
+     - { role: data_collector, tags: [ 'data_collector' ] }
