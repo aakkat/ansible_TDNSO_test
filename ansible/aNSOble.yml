@@ -34,4 +34,4 @@
     - { role: compact_CDB, tags: [ 'compact_CDB' ] }
     - { role: device_migration, tags: [ 'device_migration' ] }
     - { role: config_NSO, tags: [ 'config_NSO' ] }
-    - { role: copy_master_to_slave, tags: [ 'copy_master_to_slave' ] }
+    # - { role: copy_master_to_slave, tags: [ 'copy_master_to_slave' ] }

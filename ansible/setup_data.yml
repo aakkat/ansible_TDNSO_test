@@ -1,6 +1,7 @@
 ## Enter Parent LOG Directory path where you want to save logs of NSO server and APP. logs_$hostname directory would be created under this parent directory.
 LOG_DIR: "/tmp"
 ansible_user: nsoadmin
+CDB_DIR: /var/opt/ncs/cdb/
 
 # Install Ubuntu 18.04 onto virtual machine
 # Vcenter credentials must be present in the secure setup and host vars 
@@ -112,9 +113,9 @@ GET_REMOTE_HA_FILE: false
 HAImageLocation: '{{ playbook_dir }}/files/ncs-{{ TailfHCCNSOVersion }}-tailf-hcc-project-{{ TailfHCCVersion }}.signed.bin'
 TailfHCCVersion: 5.*
 TailfHCCNSOVersion: 5.4.4
-PrimaryIP: 172.18.176.61
-SecondaryIP: 172.18.176.62
-VIP: 10.18.176.63
+PrimaryIP: 172.18.176.42
+SecondaryIP: 172.18.176.43
+VIP: 10.18.176.44
 # VIPNetMask: 255.255.255.128
 VIPInterfacePrimary: ens192
 VIPInterfaceSecondary: ens192

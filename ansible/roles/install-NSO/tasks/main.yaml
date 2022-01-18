@@ -1,6 +1,7 @@
 - name: set logfile permissions
   file:
     path: /tmp/aNSOble.log
+    state: touch
     mode: 0777
   become: yes
 - name: Create NSO admin group
@@ -141,11 +142,16 @@
   become: yes
 
 - name: Reboot immediately if there was a change.
-  shell: "sleep 5 && reboot"
+  shell: "reboot"
   async: 1
   poll: 0
   when: ncs_current_dir.stat.exists == False
   become: yes
+
+- name: Pause for 2 minutes for vms to come back up
+  pause:
+    minutes: 2
+  when: ncs_current_dir.stat.exists == False
 
 - name: Wait for the reboot to complete if there was a change.
   wait_for_connection:
