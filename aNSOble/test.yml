@@ -1,8 +1,0 @@
----
- - hosts: all
-   vars_files:
-    - setup_data.yml
-   environment:
-        PATH: "{{ ansible_env.PATH }}:/opt/ncs/current/bin"
-   roles:
-     - { role: data_collector, tags: [ 'data_collector' ] }       
