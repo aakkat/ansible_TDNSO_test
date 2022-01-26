@@ -1,0 +1,171 @@
+- name: Check for upgrade version directory in /opt/ncs/
+  shell: ls -d ncs-{{ ncs_upgrade_version }} | cut -c5-20
+  args:
+    chdir: /opt/ncs/
+  register: upgrade_dir_name
+
+- debug:
+   msg: "NSO Version {{ncs_upgrade_version}} not found"
+  when: upgrade_dir_name is defined and not (upgrade_dir_name.stdout_lines|length>0)
+
+
+- name: Installing NSO {{ncs_upgrade_version}} 
+  block:
+
+  - name: determine NSO version
+    shell:  ncs --version
+    register: out1
+  - shell: echo "{{out1.stdout}}" | cut -c1-3
+    register: out2
+  - set_fact:
+      NSO_VER: "{{out2.stdout|float}}"
+  - debug:
+        msg: "version is {{NSO_VER}}"
+  - set_fact:
+          compact_needed: false
+  - set_fact:
+          compact_needed: true
+    when: ( NSO_VER|float < 5.0 and ncs_upgrade_version[0]|int >= 5)
+  - debug:
+        msg: "compact is {{compact_needed}}"
+  - name: set ncs_cli permissions
+    include_role:
+     name: add_user_to_NCSCLI
+
+  - name: disable ha
+    include_role:
+      name: enable_disable_HA
+    vars:
+      mode: disable
+
+  # - name: backup_restore_NSO
+  #   include_role:
+  #     name: backup_restore_NSO
+  #   vars:
+  #     mode: backup
+
+
+
+  - name: Stop NCS process to upgrade
+    shell: ncs --stop >> /tmp/aNSOble.log
+    environment:
+          PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
+    ignore_errors: yes
+
+  - name: set logfile permissions
+    file:
+      path: /tmp/aNSOble.log
+      state: touch
+      mode: 0777
+    become: yes
+
+  - name: Download NSO install file (Remote copy)
+    get_url:
+      url: "{{ NSOImageLocation }}" 
+      dest: /tmp/NSO.bin
+      mode: '640'
+    when: NSOCopyType == 'remote'
+
+  - name: Copy NSO install file (Local copy)
+    copy:
+      src: "{{ NSOImageLocation }}" 
+      dest: /tmp/NSO.bin
+      mode: '740'
+    when: NSOCopyType == 'local'
+    become: yes
+
+  - name: Unpack NSO install file
+    shell: sh /tmp/NSO.bin --system-install --install-dir /opt/ncs/ --non-interactive >> /tmp/aNSOble.log 2>&1
+    args:
+      chdir: /tmp/
+    become: yes
+
+
+  - name: Making sure /var/opt/ncs is accessible to all users
+    file:
+      path: /var/opt/ncs
+      state: directory
+      recurse: yes
+      mode: '0755'
+    become: yes
+
+
+  - name: Changing /var/opt/ncs/packages ownership to {{ ansible_user }} user
+    file:
+      path: /var/opt/ncs/packages
+      state: directory
+      recurse: yes
+      mode: '0755'
+      owner: "{{ ansible_user }}"
+      group: ncsadmin
+    become: yes
+
+
+  - name: Changing /opt/ncs ownership to {{ ansible_user }} user
+    file:
+      path: /opt/ncs
+      state: directory
+      recurse: yes
+      mode: '0755'
+      owner: "{{ ansible_user }}"
+      group: ncsadmin
+    become: yes
+
+
+  - name: Store ncs.conf into ./configs/HOSTNAME/etc/ncs/ncs.conf
+    ansible.builtin.fetch:
+      src: /etc/ncs/ncs.conf
+      dest: /tmp/configs
+    become: yes
+    register: filename
+
+  - name: Run python script on downloaded ncs.conf
+    local_action: command ./parse_configs.py --filepath {{filename.dest}}
+    
+  - name: Copy NSO install file (Local copy)
+    copy:
+      src: "{{filename.dest}}" 
+      dest: /etc/ncs/ncs.conf
+      mode: '755'
+    become: yes
+
+  - name: Remove file (delete file)
+    ansible.builtin.file:
+      path: "{{filename.dest}}"
+      state: absent
+
+  - name: Point link to new ncs version
+    block:
+    - name: Check again for upgrade version directory in /opt/ncs/
+      shell: ls -d ncs-{{ ncs_upgrade_version }}
+      args:
+        chdir: /opt/ncs/
+      register: new_version_dir_name
+    - debug:
+       msg: 'Warning no new ncs version {{ ncs_upgrade_version }} found'
+      when: new_version_dir_name is defined and not (new_version_dir_name.stdout_lines|length>0)
+    - name: remove current pointer
+      shell: rm -rf ./current
+      args:
+        chdir: /opt/ncs/
+      become: yes
+      when: new_version_dir_name is defined and (new_version_dir_name.stdout_lines|length>0)
+    - name: add new current pointer to upgraded version
+      shell: ln -sf ./{{new_version_dir_name.stdout}} current
+      args:
+        chdir: /opt/ncs/
+      become: yes
+      when: new_version_dir_name is defined and (new_version_dir_name.stdout_lines|length>0)
+
+  - name: Start NSO service
+    shell: |
+        source /etc/profile.d/ncs.sh
+        /etc/init.d/ncs start >> /tmp/aNSOble.log 2>&1
+    become: true
+
+  - name: run cdb compact if 4.x -> 5.x+
+    include_role:
+      name: compact_CDB
+    when: compact_needed
+
+  when: upgrade_dir_name is defined and not (upgrade_dir_name.stdout_lines|length>0)
