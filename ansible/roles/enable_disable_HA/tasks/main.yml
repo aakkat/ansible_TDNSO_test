@@ -30,6 +30,7 @@
         shell: |
            echo "{{HA_CMD}} be-none" | ncs_cli -C ; echo "{{HA_CMD}} disable"  | ncs_cli -C
         register: out4
+        ignore_errors: true
         become: true
       - debug:
            msg: "{{out4.stdout}}"
