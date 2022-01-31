@@ -3,6 +3,8 @@ LOG_DIR: "/tmp"
 ansible_user: nsoadmin
 CDB_DIR: /var/opt/ncs/cdb/
 
+# Set this parameter to True in case to start NSO with start-with-package-reload
+start-with-package-reload: False
 # Install Ubuntu 18.04 onto virtual machine
 # Vcenter credentials must be present in the secure setup and host vars 
 # Must be present for the desired setup, see example.txt in host vars
