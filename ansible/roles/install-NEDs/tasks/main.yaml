@@ -1,6 +1,7 @@
 - name: set logfile permissions
   file:
     path: /tmp/aNSOble.log
+    state: touch
     mode: 0777
   become: yes
 - name: Copy NED install file (Local copy)

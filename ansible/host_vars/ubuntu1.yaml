@@ -4,10 +4,10 @@ vmware_folder: CAaaS/vm/
 ova_url: https://cloud-images.ubuntu.com/releases/bionic/release/ubuntu-18.04-server-cloudimg-amd64.ova
 esxi_hostname: 172.18.176.21
 ova_file: /ova/ubuntu.ova
-vm_name: "NSO_ANSIBLE"
+vm_name: "BHARTI_CFS"
 hardware:
   num_cpus: 4
-  memory_mb: 8192
+  memory_mb: 24576
 annotation: 'sample VM based on Ubuntu Cloud Image'
 # this avoids excessive syslog messages from multipathd under Ubuntu 20.04
 # customvalues:
@@ -20,7 +20,7 @@ disk:
     unit_number: 0
     type: thin
 static_ip:
-  ipv4: 172.18.176.41
+  ipv4: 172.18.176.100
   netmask: 25
   gateway: 172.18.176.1
   dns_servers: [64.102.6.247, 8.8.4.4]

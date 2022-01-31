@@ -1,14 +1,54 @@
 - name: set logfile permissions
   file:
     path: /tmp/aNSOble.log
+    state: touch
     mode: 0777
   become: yes
+
 - name: Copy package files (Local copy)
   copy:
     src: "{{ playbook_dir }}/files/packages/"
     dest: /var/opt/ncs/packages/
     mode: '740'
   when: remote_packages == False
+  become: yes
+
+- name: get list of all bin files
+  find:
+    paths: /var/opt/ncs/packages/
+    patterns: "^.*?\\.(?:bin)$"
+    use_regex: true
+  register: bin_files
+  when:  remote_packages == false
+
+- name: set logfile permissions
+  file:
+    path: /tmp/package_unload/
+    state: directory
+    mode: 0777
+  become: yes
+
+- name: extract local bin files
+  shell: "{{item.path}}"
+  args:
+    chdir: /tmp/package_unload/
+    warn: false
+  loop: "{{ bin_files.files }}"
+  when: remote_packages == false
+  become: yes
+
+- name: get list of all tar files
+  find:
+    paths: /tmp/package_unload/
+    patterns: "^.*?\\.(?:tar|tar\\.gz)$"
+    use_regex: true
+  register: tar_files
+  when:  remote_packages == false
+
+- name: extract tar local to packages
+  shell: "tar -xzvf {{item.path}} -C /var/opt/ncs/packages/"
+  loop: "{{ tar_files.files }}"
+  when: remote_packages == false
   become: yes
 
 - name: Cloning the {{ RepositoryBranch }} branch of the repository to /tmp/repo directory
@@ -37,6 +77,10 @@
   become: true
   when:  remote_packages == True and item.needsCompiling 
   loop: "{{ Packages }}"
+
+- name: Run compile on packages specified
+  include_role:
+   name: compile_specified_packages
 
 - name: Reloading NSO packages
   shell: |
