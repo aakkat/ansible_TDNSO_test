@@ -51,38 +51,6 @@
   when: remote_packages == false
   become: yes
 
-- name: Find /var/opt/ncs/packages/ all directories, exclude nginx and mysql
-  find:
-    paths: /var/opt/ncs/packages/
-    recurse: no
-    patterns: '{{ compiled_packages }}'
-    use_regex: true
-    file_type: directory
-  register: package_directories
-
-- debug:
-    var: package_directories
-- name: set package permissions
-  file:
-    path: "{{ item.path }}"
-    recurse: yes
-    state: directory
-    owner: ciscoadmin
-    group: ncsadmin
-  loop: "{{ package_directories.files }}"
-  when: remote_packages == false
-  become: yes
-
-- name: compile specified local packages
-  shell: make clean all
-  args:
-    chdir: "{{ item.path }}/src/"
-    warn: false
-  environment:
-    NCS_DIR: /opt/ncs/current
-  loop: "{{ package_directories.files }}"
-  when: remote_packages == false
-
 - name: Cloning the {{ RepositoryBranch }} branch of the repository to /tmp/repo directory
   git:
     repo: "https://{{GITUser}}:{{GITKeyPass}}@{{RepositoryURL}}"
@@ -109,6 +77,10 @@
   become: true
   when:  remote_packages == True and item.needsCompiling 
   loop: "{{ Packages }}"
+
+- name: Run compile on packages specified
+  include_role:
+   name: compile_specified_packages
 
 - name: Reloading NSO packages
   shell: |

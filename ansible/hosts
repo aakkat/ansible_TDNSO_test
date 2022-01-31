@@ -3,7 +3,7 @@
 vcenter
 
 [ubuntu]
-ubuntu1 ansible_ssh_extra_args='-o StrictHostKeyChecking=no' ansible_host=172.18.176.41
+ubuntu1 ansible_ssh_extra_args='-o StrictHostKeyChecking=no' ansible_host=172.18.176.101
 #ubuntu2 ansible_ssh_extra_args='-o StrictHostKeyChecking=no' ansible_host=172.18.176.43
 
 [vcenter:children]

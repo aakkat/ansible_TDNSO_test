@@ -50,7 +50,7 @@ DfltAuthPass: admin
 # vars file for nso_install
 # nso_install_dir: NSO_FILES
 # nso_run_dir: ncs-run
-nso_installer_name: nso-4.7.9.linux.x86_64.signed.bin
+#nso_installer_name: nso-4.7.9.linux.x86_64.signed.bin
 # nso_java_opts: -Xmx2G -Xms1G
 # nso_package_list: 
 #     - ncs-5.4.4-cisco-ios-6.74.5.signed.bin
@@ -81,7 +81,8 @@ remote_packages: False
 #Set needsCompiling to true if you wish your package to be compiled after the import.
 #Omit RepositoryURL if you don't want to install any service packages from a repository
 #A list of regex for local packages that need compilation, set to .* for no compiling
-compiled_packages: [".*iosxr.*"]
+compiled_packages: 
+    -".*iosxr.*"
 # RepositoryURL: wwwin-github.cisco.com/AS-Customer/Test-Nico-Interface-Project.git
 RepositoryBranch: master
 ServicePackagesPath: packages
