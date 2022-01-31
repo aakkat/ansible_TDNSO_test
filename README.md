@@ -81,3 +81,46 @@ Full documentation of aNSOble can be found on SCDP page of project: ```https://s
 ## Contacts
 
 Nicolas Fournier <coangel@cisco.com>
+
+## AWX ( Free licensed Ansible Tower )
+
+The AWX Collections allow Ansible Playbooks to interact with AWX(Ansible Tower). Much like interacting with AWX via the web-based UI or the API, the modules provided by the AWX Collection are another way to create, update or delete objects as well as perform tasks such as run jobs, configure Ansible Tower and more. This article will discuss new updates regarding this collection, as well as an example playbook and details on how to run it successfully.
+
+## Installation of AWX
+
+1. As prerequisites, below tools are required to be installed.
+  **docker
+  **docker-compose
+  **ansible
+  **node and NPM
+  **git
+2. download the latest AWX zip file from Github.
+ $ wget https://github.com/ansible/awx/archive/17.1.0.zip
+3. unzip the file
+ $ unzip 17.1.0.zip
+4. locate the  awx-17.1.0 folder in your directory
+ $ cd awx-17.1.0 /installer
+5. Open inventory and edit below details.
+  admin_user=admin
+  admin_password=<Strong-Admin-password>
+  secret_key=<generate it>
+  project_data_dir=/opt/awx_projects
+6. run the Ansible playbook file called install.yml
+ $ ansible-playbook -i inventory install.yml
+7. To access the dashboard, launch your browser and browse the server’s IP
+
+**access AWX UI by http://$LOCALHOST_IP
+
+**From UI, Engineer can manage AWX organization, users, Projects, credentials creation.
+
+**Use below APIs to fetch data from AWX List hosts --> curl -s -k --user $user:$pass http://$host_IP/api/v2/inventories/2/hosts/ | jq '.results | .[] | .name ' list templates --> curl -s -k --user $user:$pass http://$host_IP/api/v2/job_templates/ | jq '.results | .[] | .name ' List inventories --> curl -s -k --user $user:$pass http://$host_API/api/v2/inventories/ | jq '.results | .[] | .name '
+
+**Use below API to add data at AWX UI Add host --> curl --user $user:$pass -X POST -d @host.json -H "Content-Type: application/json" -k http://$host_IP/api/v2/inventories/2/hosts/
+
+**Use below API to trigger a template --> curl -f -k -H 'Content-Type: application/json' -XPOST  --user admin:nsoadmin http://10.78.236.119/api/v2/job_templates/7/launch/
+
+host.json standard format will be as below host.json --> { "name": "$host_IP", "description": "this is a test host added via API", "enabled": true, "instance_id": "", "variables": "ansible_connection: ssh\nansible_password: $user_password\nansible_ssh_user: $username\nhost_key_checking: False" }
+
+##Contacts
+Mohit Kumar Pal <mohpal@cisco.com>
+
