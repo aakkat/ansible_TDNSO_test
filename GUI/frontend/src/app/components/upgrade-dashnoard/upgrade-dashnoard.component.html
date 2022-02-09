@@ -1,0 +1,311 @@
+<div >
+
+    <div>
+        <ul class="breadcrumb">
+            <li><a><span class="icon-home"></span></a></li>
+            <li><span>Upgrade Dashboard</span></li>
+        </ul>
+    </div>
+<div class="col-12 col-lg-12 ">
+   
+    <div id="vleft-content" class="tab-content">
+        <div class="modal modal--fluid " id="modal-fluid" *ngIf="showloader == true">
+            <div class="modal__dialog ">
+                <div class="modal__content opacity-40 modal__body">
+                    <div class="loading-dots loading-dots--tertiary absolute-center"  aria-label="Loading, please wait...">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div> 
+                    <p class="absolute-center half-padding-top"> Loading, please wait... </p>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="modal modal--small " id="modal-small" *ngIf="showalert == true">
+            <div class="modal__dialog">
+                <div class="modal__content">
+                    <a class="modal__close" (click)="closeModal();"><span class="icon-close"></span></a>
+                    <div class="modal__body">
+                       <p>Please click Run Data Collector to fetch details.</p>
+                    </div>
+                    <div class="modal__footer">
+                        <button class="btn" (click)="closeModal();">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+  
+        <div id="vleft-upgradeDashboard-content" class="tab-pane" [ngClass]="{'active': activeTabs === 'upgradeDashboard'}">
+            <div class="row">
+                <div class="col-md-3 base-margin-bottom">
+
+                    <div class="form-group dropdown" [ngClass]="{'active': isOpenDropDown }" (click) = "dropDownToggle();">
+                        <div class="form-group__text select">
+                            <input id="select-type-styled" value="{{upgradeOption}}">
+                            <label for="select-type-styled"></label>
+                        </div>
+                        <div class="dropdown__menu">
+                            <!-- <select>
+                            <option *ngFor="let option of data" [value]="option" [ngClass]="{'selected': upgradeOption === option}">
+                                {{option}}
+                              </option>
+                            </select> -->
+                            <a  *ngFor="let option of hostlist"  [ngClass]="{'selected': upgradeOption === option }" (click)="selectOpt(option)">{{option}}</a>
+                            <!-- <a [ngClass]="{'selected': upgradeOption === 'nsf-rfs-cisco'}" (click)="selectOpt('nsf-rfs-cisco')">nsf-rfs-cisco</a> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8 base-margin-bottom" *ngIf="upgradeOption !== '' && upgradeOption !== 'Select Host'">
+                     <div class="btn btn--secondory" (click)="collectdata();"> <i class="icon-setup-assistant"></i><span> Run Data Collector </span></div>
+
+                </div>
+                <div class="col-md-1 base-margin-bottom" *ngIf="upgradeOption !== '' && upgradeOption !== 'Select Host'">
+                    <div class="row" >
+                            <!-- <div class="btn btn--secondory" (click)="openModal('open')"> <i class="icon-add"></i>Add Host</div> -->
+                            <div class="btn btn--secondory" (click)="togglemore();"> <i class="icon-more"></i></div>
+                            <div class="form-group dropdown dropdown--left" [ngClass]="{'active': isOpenmore }" (click) = "togglemore();">
+                                <div class="dropdown__menu">
+                                    <!-- <select>
+                                    <option *ngFor="let option of data" [value]="option" [ngClass]="{'selected': upgradeOption === option}">
+                                        {{option}}
+                                      </option>
+                                    </select> -->
+                                    <a  *ngFor="let option of morelist"  [ngClass]="{'selected': moreOption === option }" (click)="selectmore(option)">{{option}}</a>
+                                    <!-- <a [ngClass]="{'selected': upgradeOption === 'nsf-rfs-cisco'}" (click)="selectOpt('nsf-rfs-cisco')">nsf-rfs-cisco</a> -->
+                                </div>
+                            </div>
+                    </div>
+
+                   
+                    <!-- <div class="row" *ngIf="upgradeOption == 'add_host'">
+                        <div class="col-md-3">
+                            <div class="form-group__text">
+                                <input id="input-state-default" type="file">
+                                <label for="input-state-default"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group__text">
+                                <input class="btn btn--primary" style="background-color: var(--cui-theme-primary-lighter);color:#ffffff;" type="button" value="Submit">
+                                <label for="input-state-default"></label>
+                            </div>
+                        </div>
+                    </div> -->
+                </div>
+           
+            </div>
+            <br>
+            <div class="modal modal--large " id="modal-large" *ngIf="model == 'open'">
+                <div class="modal__dialog">
+                    <form #f="ngForm" novalidate>
+                    <div class="modal__content">
+                        <a class="modal__close" (click)="openModal('close')"><span class="icon-close"></span></a>
+                        <div class="modal__header">
+                            <div class="modal__title">Add New Host</div>
+                        </div>
+                        <div class="modal__body">
+                            <div class="row">
+                                <div class="col-lg-1">
+                                </div>
+                                <div class="col-lg-10">
+                                    <div class="form-group form-group--horizontal">
+                                        <div class="form-group__text">
+                                           <input id="name" type="text" name="host.name" [(ngModel)]="host.name" #name="ngModel" required>
+                                            <label class="col-3" for="name">Host Name/IP <span title="this is a required field">*</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-group--horizontal">
+                                        <div class="form-group__text">
+                                            <textarea id="textarea-label-default" class="textarea" name="host.description" #name="ngModel" [(ngModel)]="host.description" rows="3"></textarea>
+                                            <label class="col-3" for="input-size-default">Host Description</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-group--horizontal">
+                                        <div class="form-group__text">
+                                            <input id="input-size-default" type="text" name="host.username" [(ngModel)]="host.username" #name="ngModel"  required>
+                                            <label class="col-3" for="input-size-default">Host Username <span title="this is a required field">*</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-group--horizontal">
+                                        <div class="form-group__text">
+                                            <input id="input-size-default" type="text" name="host.password"  #name="ngModel" [(ngModel)]="host.password" required>
+                                            <label class="col-3" for="input-size-default">Host Password <span title="this is a required field">*</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group hide form-group--horizontal">
+                                        <div class="form-group__text">
+                                            <input id="input-size-default" type="text" name="host.instanceid" #name="ngModel" [(ngModel)]="host.instanceid">
+                                            <label class="col-3" for="input-size-default">Instance Id</label>
+                                        </div>
+                                    </div>
+                                  
+                                    <div class="form-group  hide form-group--horizontal">
+                                        <div class="form-group__text">
+                                            <label class="col-3" for="input-size-default">Enabled</label>
+                                            <label class="switch">
+                                                <input type="checkbox" name="host.enable" #name="ngModel" [(ngModel)]="host.enable" checked>
+                                                <span class="switch__input"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            <!-- </form> -->
+                            </div>
+                        </div>
+                        <div class="modal__footer">
+                            <button class="btn" (click)="onSubmit()">Submit</button>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+            <div  *ngIf="showalert == true" class="text-link" ><p>Please click Run Data Collector to fetch details.</p></div>
+            <div class="col-md-4" *ngIf="showerror == true">
+                <div class="alert alert--warning">
+                    <div class="alert__icon icon-warning-outline"></div>
+                    <div class="alert__message">{{errormsg}}</div>
+                </div>
+                </div>
+            <div class="row" *ngIf="upgradeOption !== '' && upgradeOption !== 'Select Host'">
+                <div class="col-md-12 base-margin-bottom" *ngIf="collectflag == true && showloader == false">
+                    <div class="row " >
+                        <div class="col-md-4" >     
+                        <div class="half-padding-top"><span class="text-weight-600">Host: </span><span class="text-weight-300"> {{selhost.Static_hostname ? selhost.Static_hostname : ""}}</span></div>
+                        <div class="half-padding-top"><span class="text-weight-600">NSO Version: </span><span class="text-weight-300"> {{selhost.ncs_version? selhost.ncs_version : ""}}</span></div>
+                        <div class="half-padding-top"><span class="text-weight-600">HA Status: </span><span class="text-weight-300"> {{selhost['ha-mode']? selhost['ha-mode'] : ""}}</span></div>
+
+                        </div>
+                        <div class="col-md-4" >   
+                        <!-- <div class="text-weight-300">HA Status:{{selhost.ha_status? selhost.ha_status : ""}} </div> -->
+                        <div class="half-padding-top"><span class="text-weight-600">Java: </span><span class="text-weight-300">{{selhost.java_version?selhost.java_version:""}}</span> </div>
+                        <div class="half-padding-top"><span class="text-weight-600">Python: </span><span class="text-weight-300"> {{selhost.python_version?selhost.python_version:""}}</span></div>
+                        <div class="half-padding-top"><span class="text-weight-600">Service Packages Count: </span><span class="text-weight-300"> {{selhost.Service_packages_count? selhost.Service_packages_count : ""}}</span></div>
+
+                    </div>
+                    <div class="col-md-4" > 
+                        <div class="half-padding-top"><span class="text-weight-600">Linux: </span><span class="text-weight-300"> {{selhost.Operating_System?selhost.Operating_System:""}} {{selhost.Kernel?selhost.Kernel:"" }}</span></div>
+                        <div class="half-padding-top"><span class="text-weight-600">Apache Ant: </span><span class="text-weight-300"> {{selhost.ant_version?selhost.ant_version: ""}}</span> </div>
+                    </div>
+                    </div>
+                <br>
+                <p>Logs</p>
+                    <div class="row" >
+                    <div class="col-md-4" > 
+                        <div class="text-weight-300 half-padding-top">
+                            <a class="markup-toggle"  target="_blank"  (click)="getfiledata('linux_lib')" ><span class="markup-label">Linux Packages </span></a> <button class="qtr-padding-left" [disabled]="filetype !=='linux_lib'" > <i class="icon-download"  (click)="download()"></i></button>
+                        </div>
+                        <div class="text-weight-300 half-padding-top"> 
+                            <a class="markup-toggle"  target="_blank" (click)="getfiledata('python_lib')"><span class="markup-label">Python Packages </span></a> <button class="qtr-padding-left" [disabled]="filetype !=='python_lib'" ><i class="icon-download"  (click)="download()"></i></button></div>
+                            <div class="text-weight-300 half-padding-top">
+                                <a class="markup-toggle" target="_blank"  (click)="getfiledata('service_tailf-hcc')"><span class="markup-label">Service Packages </span></a><button class="qtr-padding-left" [disabled]="filetype !=='service_tailf-hcc'" > <i class="icon-download" (click)="download()"></i> </button>
+                            </div>
+ 
+                        </div>
+                        <div class="col-md-4" > 
+                            <div class="text-weight-300 half-padding-top">
+                                <a class="markup-toggle"  target="_blank" (click)="getfiledata('NED_list')" ><span class="markup-label">NED List </span></a> <button class="qtr-padding-left" [disabled]="filetype !=='NED_list'" ><i class="icon-download"  (click)="download()"></i></button>
+                            </div>
+                            <div class="text-weight-300 half-padding-top">
+                                <a class="markup-toggle"  target="_blank" (click)="getfiledata('NED_SETTINGS')" ><span class="markup-label">NED Setting </span></a> <button class="qtr-padding-left" [disabled]="filetype !=='NED_SETTINGS'" ><i class="icon-download"  (click)="download()"></i></button>
+                            </div>
+                            <div class="text-weight-300 half-padding-top">
+                                <a class="markup-toggle"  target="_blank" (click)="getfiledata('NSO_VAL')" ><span class="markup-label">NSO Validation </span></a> <button class="qtr-padding-left" [disabled]="filetype !=='NSO_VAL'" ><i class="icon-download"  (click)="download()"></i></button>
+                            </div>
+                        </div>
+                        <div class="col-md-4" >
+                    
+                        <div class="text-weight-300 half-padding-top">
+                            <a class="markup-toggle"  target="_blank" (click)="getfiledata('DEVICE_GROUP')" ><span class="markup-label">Device Group </span></a> <button class="qtr-padding-left" [disabled]="filetype !=='DEVICE_GROUP'" ><i class="icon-download"  (click)="download()"></i></button>
+                        </div>
+                        <div class="text-weight-300 half-padding-top">
+                            <a class="markup-toggle"  target="_blank" (click)="getfiledata('DEVICE_SETTING')" ><span class="markup-label">Device Setting </span></a> <button class="qtr-padding-left" [disabled]="filetype !=='DEVICE_SETTING'" ><i class="icon-download"  (click)="download()"></i></button>
+                        </div>
+                        <div class="text-weight-300 half-padding-top">
+                            <a class="markup-toggle"  target="_blank" (click)="getfiledata('DEVICE_STATE')" ><span class="markup-label">Device State </span></a> <button class="qtr-padding-left" [disabled]="filetype !=='DEVICE_STATE'" ><i class="icon-download"  (click)="download()"></i></button>
+                        </div>
+                    </div>
+                    <div class="col-md-4" >
+                        <div class="text-weight-300 half-padding-top"> <a class="markup-toggle"  target="_blank" (click)="getfiledata('package_list')" ><span class="markup-label">NSO Packages</span></a> <button class="qtr-padding-left" [disabled]="filetype !=='package_list'" ><i class="icon-download"  (click)="download()"></i></button></div>
+
+                        <div class="text-weight-300 half-padding-top">
+                            <a class="markup-toggle"  target="_blank" (click)="getfiledata('HA_CONFIG')" ><span class="markup-label">HA Config </span></a> <button class="qtr-padding-left" [disabled]="filetype !=='HA_CONFIG'" ><i class="icon-download"  (click)="download()"></i></button>
+                        </div>
+                       
+                    </div>
+                    <div class="col-md-4" >
+                        <div class="text-weight-300 half-padding-top">
+                            <a class="markup-toggle"  target="_blank"  (click)="getfiledata('java-vm_Logging')"><span class="markup-label">Java VM Logging </span></a> <button class="qtr-padding-left" [disabled]="filetype !=='java-vm_Logging'" > <i class="icon-download"  (click)="download()"></i></button>
+                        </div>
+                        <div class="text-weight-300 half-padding-top"> <a class="markup-toggle"  target="_blank" (click)="getfiledata('python-vm_Logging')" ><span class="markup-label">Python VM Logging </span></a> <button class="qtr-padding-left" [disabled]="filetype !=='python-vm_Logging'" ><i class="icon-download"  (click)="download()"></i> </button></div>
+                    </div>
+                    <div class="col-md-4" >
+                        <div class="text-weight-300 half-padding-top"> <a class="markup-toggle"  target="_blank" (click)="getfiledata('NSO_RESOURCEPOOL')"><span class="markup-label">Resources Pool </span></a> <button class="qtr-padding-left" [disabled]="filetype !=='NSO_RESOURCEPOOL'" ><i class="icon-download"  (click)="download()"></i></button></div>
+                        <div class="text-weight-300 half-padding-top">
+                            <a class="markup-toggle"  target="_blank" (click)="getfiledata('AUTH_GROUP')" ><span class="markup-label">Auth Group </span></a> <button class="qtr-padding-left" [disabled]="filetype !=='AUTH_GROUP'" ><i class="icon-download"  (click)="download()"></i></button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <div class="col-md-6 base-margin-bottom" *ngIf="collectflag == true && showloader == false">
+                    <div class="">Devices</div>
+                   
+                        
+
+                <div class="responsive-table">
+                    <table class="table table--bordered" aria-label="Bordered table example">
+                        <thead>
+                            <tr>
+                                <th>NED</th>
+                                <th>#devices</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!--tr *ngFor="let item of deviceList">
+                                <td>{{item.ned}}</td>
+                                <td>{{item.devices}}</td>
+                                <td>Row 1</td>
+                            </tr-->
+                            
+                        </tbody>
+                    </table>
+                </div>
+
+            
+                </div>
+                <div class="col-md-6 base-margin-bottom" *ngIf="collectflag == true && showloader == false">
+                    <div class="">Services</div>
+                    
+                        <div class="responsive-table">
+                            <table class="table table--bordered" aria-label="Bordered table example">
+                                <thead>
+                                    <tr>
+                                        <th>Service</th>
+                                        <th>#intances to migrate</th>
+                                        <th>#Migrated Intances</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!--tr *ngFor="let item of servicesList">
+                                        <td>{{item.services}}</td>
+                                        <td>{{item.intances}}</td>
+                                        <td>{{item.migratedIntances}}</td>
+                                        <td>
+                                            <button class="btn">Migrate</button>
+                                            <button class="btn">Migration Report</button>
+                                        </td>
+                                    </tr-->
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+</div>
