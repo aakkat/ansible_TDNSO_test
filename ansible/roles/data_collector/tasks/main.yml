@@ -392,3 +392,12 @@
                   cat {{LOG_DIRR}}/log_DEVICE_SETTING_{{DATE}}.xml | sed -z 's/,/\n/g' > {{LOG_DIRR}}/log1_DEVICE_SETTING_{{DATE}}.xml
                   mv {{LOG_DIRR}}/log1_DEVICE_SETTING_{{DATE}}.xml {{LOG_DIRR}}/log_DEVICE_SETTING_{{DATE}}.xml
           delegate_to: localhost
+        - name: Print ncs.conf file
+          shell: cat /etc/ncs/ncs.conf
+          register: ncs
+          become: true
+        - name: Write results to logfile {{LOG_DIRR}}/ncs.conf
+          block:
+            - shell: |
+                 echo "{{ncs.stdout}}" > {{LOG_DIRR}}/ncs.conf
+          delegate_to: localhost
