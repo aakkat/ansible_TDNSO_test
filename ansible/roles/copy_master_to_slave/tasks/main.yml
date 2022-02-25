@@ -35,16 +35,10 @@
          - "master is {{master}}"
          - "secondary is {{secondary}}"
  - block:
-   - shell: |
-       sshpass -p {{PASS}} ssh -t -o StrictHostKeyChecking=no {{USER}}@{{secondary}} 'sudo su - -c "ncs --version"'
-     register: NSO_VER
-   - set_fact:
-        NSO_VERSION1: "{{NSO_VER.stdout}}"
-
    - debug:
-        msg: "copying files from {{master}} to {{secondary}}"
+        msg: "copying packages and ncs files from {{master}} to {{secondary}}"
    - shell: |
-         sshpass -p {{PASS}} sudo scp  -o StrictHostKeyChecking=no -r /opt/ncs/ncs-{{NSO_VERSION}}/packages/ {{USER}}@{{secondary}}:/opt/ncs/ncs-{{NSO_VERSION1}}/
+         sshpass -p {{PASS}} sudo scp  -o StrictHostKeyChecking=no -r /var/opt/ncs/packages/ {{USER}}@{{secondary}}:/var/opt/ncs/packages/
          sshpass -p {{PASS}} sudo scp  -o StrictHostKeyChecking=no /etc/ncs/ncs.conf {{USER}}@{{secondary}}:/etc/ncs/
          sshpass -p {{PASS}} sudo scp   -o StrictHostKeyChecking=no /etc/ncs/ncs.crypto_keys {{USER}}@{{secondary}}:/etc/ncs/
    when: ( master|trim in ansible_host )
