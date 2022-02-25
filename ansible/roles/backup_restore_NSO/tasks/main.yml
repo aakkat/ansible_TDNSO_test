@@ -58,7 +58,7 @@
          - shell: |
                echo "BACKUP_FILE: {{Backup_file}}" > {{LOG_DIRR}}/log_backup_file.json
                echo "SIZE: {{SIZE}}" >> {{LOG_DIRR}}/log_backup_file.json
-               echo "Total_time: {{total_time}}" >> {{LOG_DIRR}}/log_backup_file.json
+               echo "COMPLETION_TIME: {{total_time}}" >> {{LOG_DIRR}}/log_backup_file.json
       delegate_to: localhost
    when: ( mode == 'backup' )
 
