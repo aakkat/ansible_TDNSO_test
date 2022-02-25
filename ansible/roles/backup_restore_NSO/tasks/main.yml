@@ -11,6 +11,10 @@
       become: true
     - debug:
         msg: "{{out1.stdout}}"
+    - shell:  date "+%F %H:%M:%S"
+      register: end
+    - set_fact:
+            backup_time: "{{end.stdout}}"
     - shell: date | awk -F" " '{print $4}'
       register: time2
     - set_fact:
@@ -58,7 +62,8 @@
          - shell: |
                echo "BACKUP_FILE: {{Backup_file}}" > {{LOG_DIRR}}/log_backup_file.json
                echo "SIZE: {{SIZE}}" >> {{LOG_DIRR}}/log_backup_file.json
-               echo "COMPLETION_TIME: {{total_time}}" >> {{LOG_DIRR}}/log_backup_file.json
+               echo "LAST_BACKUP_TIME: {{backup_time}}" >> {{LOG_DIRR}}/log_backup_file.json
+               echo "COMLETION_TIME: {{total_time}}" >> {{LOG_DIRR}}/log_backup_file.json
       delegate_to: localhost
    when: ( mode == 'backup' )
 
