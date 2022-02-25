@@ -13,6 +13,21 @@
         HA_CMD: "high-availability"
    when: ( NSO_VER|float >= 5.4 )
 
+ - shell: hostname -I | cut -d' ' -f1
+   register: output
+ - set_fact:
+         HOST: "{{output.stdout}}"
+ - block:               
+      - name: Create Directory {{LOG_DIR}}/logs_{{HOST}} on remote server {{ansible_hostname}}
+        file:
+             path: "{{LOG_DIR}}/logs_{{HOST}}"
+             state: directory
+      - set_fact:
+             LOG_DIRR: "{{LOG_DIR}}/logs_{{HOST}}"
+      - debug:
+             msg: "Directory is {{LOG_DIRR}}"
+      - shell: rm -f {{LOG_DIRR}}/log_enable_disable-HA.txt
+   delegate_to: localhost
  - name: check for disable mode and disable HA if its enabled
    block:
     - name: HA status
@@ -24,16 +39,38 @@
     - block:
        - debug:
             msg: "HA is already disabled on {{ansible_host}}"
+       - name: Write results to logfile {{LOG_DIRR}}/log_enable_disable-HA.txt
+         block:
+            - shell: |
+                 echo "HA is already disabled on {{HOST}}" > {{LOG_DIRR}}/log_enable_disable-HA.txt
+         delegate_to: localhost
       when: ( 'ncs-state ha mode none' in out3.stdout ) 
     - block:
       - name: run HA disable commands
         shell: |
            echo "{{HA_CMD}} be-none" | ncs_cli -C ; echo "{{HA_CMD}} disable"  | ncs_cli -C
         register: out4
-        ignore_errors: true
         become: true
       - debug:
            msg: "{{out4.stdout}}"
+      - name: HA status
+        shell:  echo "show ncs-state ha" | ncs_cli -C
+        register: output1
+        ignore_errors: true
+      - name: Write results to logfile {{LOG_DIRR}}/log_enable_disable-HA.txt
+        block:
+          - shell: |
+               echo "{{output1.stdout}}" > {{LOG_DIRR}}/log_enable_disable-HA.txt
+        delegate_to: localhost
+      - block:
+          - name: Write results to logfile {{LOG_DIRR}}/log_enable_disable-HA.txt
+            block:
+             - shell: |
+                 echo "Job got failed for {{HOST}} as HA is not disabled" > {{LOG_DIRR}}/log_enable_disable-HA.txt
+            delegate_to: localhost
+          - fail:
+               msg: "Job got failed for {{HOST}} as HA is not disabled"
+        when: ( 'ncs-state ha mode none' not in output1.stdout )
       when: ( 'ncs-state ha mode none' not in out3.stdout )
    when: ( mode == 'disable' )
 
@@ -48,6 +85,11 @@
       - block:
          - debug:
               msg: "HA is already enabled on {{ansible_host}}"
+         - name: Write results to logfile {{LOG_DIRR}}/log_enable_disable-HA.txt
+           block:
+            - shell: |
+                 echo "HA is already enabled on {{HOST}}" > {{LOG_DIRR}}/log_enable_disable-HA.txt
+           delegate_to: localhost
         when: ( 'ncs-state ha mode none' not in out5.stdout )
       - block:
         - name: list master and secondary servers using show running-config {{HA_CMD}}
@@ -86,5 +128,19 @@
           register: out8
         - debug:
             msg: "{{out8.stdout}}"
+        - name: Write results to logfile {{LOG_DIRR}}/log_enable_disable-HA.txt
+          block:
+            - shell: |
+                 echo "{{out8.stdout}}" > {{LOG_DIRR}}/log_enable_disable-HA.txt
+          delegate_to: localhost
+        - block:
+             - name: Write results to logfile {{LOG_DIRR}}/log_enable_disable-HA.txt
+               block:
+                 - shell: |
+                      echo "Job got failed for {{HOST}} as HA is not enabled" > {{LOG_DIRR}}/log_enable_disable-HA.txt
+               delegate_to: localhost
+             - fail:
+                  msg: "Job got failed for {{HOST}} as HA is not enabled"
+          when: ( 'ncs-state ha mode none' in out8.stdout )
         when: ( 'ncs-state ha mode none' in out5.stdout )
    when: ( mode == 'enable' )       
