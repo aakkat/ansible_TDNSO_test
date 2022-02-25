@@ -1,16 +1,21 @@
-        - shell: hostname -f
+        - shell: hostname -I | cut -d' ' -f1
           register: output
         - set_fact:
                HOST: "{{output.stdout}}"
-
-        - name: Create Directory {{LOG_DIR}}/logs_{{HOST}} on remote server
-          file:
-             path: "{{LOG_DIR}}/logs_{{HOST}}"
-             state: directory
+        - block:               
+          - name: Create Directory {{LOG_DIR}}/logs_{{HOST}} on remote server {{ansible_hostname}}
+            file:
+               path: "{{LOG_DIR}}/logs_{{HOST}}"
+               state: directory
+          - set_fact:
+                 LOG_DIRR: "{{LOG_DIR}}/logs_{{HOST}}"
+          - debug:
+                msg: "Directory is {{LOG_DIRR}}"
+          - shell:  rm -rf *
+            args:
+                chdir: "{{LOG_DIRR}}"         
           delegate_to: localhost
-        - set_fact:
-                LOG_DIRR: "{{LOG_DIR}}/logs_{{HOST}}"
-
+  
         - name: setting date variable
           shell: date "+%F-%H-%M-%S"
           register: out
@@ -22,27 +27,96 @@
         - name: Identify the Linux flavor, JAVA,PYTHON,NCS,ANT Version
           shell: |
              hostnamectl
-             java -version
-             python --version
-             echo "ncs version:";ncs --version
-             ant -version
           register: logg
           ignore_errors: true
         - debug:
               msg:
                 - "{{logg.stdout_lines}}"
                 - "{{ logg.stderr_lines }}"
-        - name: Write results to logfile {{LOG_DIRR}}/log_VERSION_{{DATE}}.txt
+        - name: Write results to logfile {{LOG_DIRR}}/log_VERSION_{{DATE}}.json
           block:
             - shell: |
-                 echo "{{logg.stdout}}" > {{LOG_DIRR}}/log_VERSION_{{DATE}}.txt
-                 echo "{{logg.stderr}}" >> {{LOG_DIRR}}/log_VERSION_{{DATE}}.txt
+                 echo "{{logg.stdout}}" > {{LOG_DIRR}}/log_VERSION_{{DATE}}.json
+                 echo "{{logg.stderr}}" >> {{LOG_DIRR}}/log_VERSION_{{DATE}}.json
           delegate_to: localhost
-
+        - name: Identify the Linux flavor, JAVA,PYTHON,NCS,ANT Version
+          shell: |
+             java -version 2>&1 | awk -F '"' '/version/ {print $2}'
+          register: logg
+          ignore_errors: true
+        - debug:
+              msg:
+                - "{{logg.stdout_lines}}"
+        - name: Write results to logfile {{LOG_DIRR}}/log_VERSION_{{DATE}}.json
+          block:
+            - shell: |
+                    echo "java version: {{logg.stdout}}" >> {{LOG_DIRR}}/log_VERSION_{{DATE}}.json
+          delegate_to: localhost
+        - name: Identify the Linux flavor, JAVA,PYTHON,NCS,ANT Version
+          shell: |
+              python --version 2>&1 | awk -F ' ' '{print $2}'
+          register: logg
+          ignore_errors: true
+        - debug:
+              msg:
+                - "{{logg.stdout_lines}}"
+        - name: Write results to logfile {{LOG_DIRR}}/log_VERSION_{{DATE}}.json
+          block:
+            - shell: |
+                    echo "python version: {{logg.stdout}}" >> {{LOG_DIRR}}/log_VERSION_{{DATE}}.json
+          delegate_to: localhost
+        - name: Identify the Linux flavor, JAVA,PYTHON,NCS,ANT Version
+          shell: |
+              ncs --version
+          register: logg
+          ignore_errors: true
+        - debug:
+              msg:
+                - "{{logg.stdout_lines}}"
+        - name: Write results to logfile {{LOG_DIRR}}/log_VERSION_{{DATE}}.json
+          block:
+            - shell: |
+                    echo "ncs version: {{logg.stdout}}" >> {{LOG_DIRR}}/log_VERSION_{{DATE}}.json
+          delegate_to: localhost
+        - name: Identify the Linux flavor, JAVA,PYTHON,NCS,ANT Version
+          shell: |
+              ant -version 2>&1 | awk -F ' ' '/version/ {print $4}'
+          register: logg
+          ignore_errors: true
+        - debug:
+              msg:
+                - "{{logg.stdout_lines}}"
+        - name: Write results to logfile {{LOG_DIRR}}/log_VERSION_{{DATE}}.json
+          block:
+            - shell: |
+                    echo "ant version: {{logg.stdout}}" >> {{LOG_DIRR}}/log_VERSION_{{DATE}}.json
+          delegate_to: localhost
+        - name: HA state status
+          shell: echo "show ncs-state ha | display json" | ncs_cli -C | grep mode | sed 's/mode/ha-mode/g'
+          register: ha
+          ignore_errors: true
+        - debug:
+              msg: "{{ha.stdout}}"
+        - name: Write results to logfile {{LOG_DIRR}}/log_VERSION_{{DATE}}.json
+          block:
+            - shell: |
+                    echo "{{ha.stdout}}" >> {{LOG_DIRR}}/log_VERSION_{{DATE}}.json
+          delegate_to: localhost
+          
+        - name: Show Service packages count
+          shell: echo "show packages package oper-status" | ncs_cli -C | awk '{print $3}' | grep -v ^$ | wc -l 
+          register: output
+        - debug:
+             msg: " Service packages count is {{output.stdout}}"
+        - block:
+            - shell: |
+                    echo "Service_packages_count: {{output.stdout}}" >> {{LOG_DIRR}}/log_VERSION_{{DATE}}.json
+          delegate_to: localhost
+          
         - name: Check NSO server status,reachability
           shell:  ps -aux | grep ncs.conf
           register: output
-        - name: Write results to logfile {{LOG_DIRR}}/log_NSO_VAL_{{DATE}}
+        - name: Write results to logfile {{LOG_DIRR}}/log_NSO_VAL_{{DATE}}.txt
           block:
             - shell: echo "{{output.stdout}}" > {{LOG_DIRR}}/log_NSO_VAL_{{DATE}}.txt
           delegate_to: localhost
@@ -123,35 +197,35 @@
              delegate_to: localhost
           when: ( 'not found' not in pip_out.stderr )
       
-        - name: HA state status
-          shell: echo "show ncs-state ha | display xml" | ncs_cli -C
-          register: output
-          ignore_errors: true
-        - debug:
-              msg: "{{output.stdout}}"
-        - name: Write results to logfile {{LOG_DIRR}}/log_HA_STATUS_{{DATE}}.xml
-          block:
-            - shell: echo "{{output.stdout}}" > {{LOG_DIRR}}/log_HA_STATUS_{{DATE}}.xml
-            - name: Data Modification
-              shell: |
-                  cat {{LOG_DIRR}}/log_HA_STATUS_{{DATE}}.xml | sed -z 's/,/\n/g' > {{LOG_DIRR}}/log1_HA_STATUS_{{DATE}}.xml
-                  mv {{LOG_DIRR}}/log1_HA_STATUS_{{DATE}}.xml {{LOG_DIRR}}/log_HA_STATUS_{{DATE}}.xml
-          delegate_to: localhost
-
         - name: HA configuration
-          shell: echo "show running-config ha | display xml" | ncs_cli -C
-          register: output
-          ignore_errors: true
-        - debug:
-              msg: "{{output.stdout}}"
-        - name: Write results to logfile {{LOG_DIRR}}/log_HA_CONFIG_{{DATE}}.xml
           block:
+          - name: determine NSO version
+            shell:  ncs --version
+            register: out1
+          - shell: echo "{{out1.stdout}}" | cut -c1-3
+            register: out2
+          - set_fact:
+               NSO_VER: "{{out2.stdout|float}}" 
+          - debug:
+               msg: "version is {{NSO_VER}}"
+          - set_fact:
+               HA_CMD: "ha"
+          - set_fact:
+               HA_CMD: "high-availability"
+            when: ( NSO_VER|float >= 5.4 )
+          - shell: echo "show running-config {{HA_CMD}} | display xml" | ncs_cli -C
+            register: output
+            ignore_errors: true
+          - debug:
+              msg: "{{output.stdout}}"
+          - name: Write results to logfile {{LOG_DIRR}}/log_HA_CONFIG_{{DATE}}.xml
+            block:
             - shell: echo "{{output.stdout}}" > {{LOG_DIRR}}/log_HA_CONFIG_{{DATE}}.xml
             - name: Data Modification
               shell: |
                   cat {{LOG_DIRR}}/log_HA_CONFIG_{{DATE}}.xml | sed -z 's/,/\n/g' > {{LOG_DIRR}}/log1_HA_CONFIG_{{DATE}}.xml
                   mv {{LOG_DIRR}}/log1_HA_CONFIG_{{DATE}}.xml {{LOG_DIRR}}/log_HA_CONFIG_{{DATE}}.xml
-          delegate_to: localhost
+            delegate_to: localhost
 
         - name: Resource Pool configuration
           shell: echo "show running-config resource-pools ip-address-pool | display xml" | ncs_cli -C
@@ -213,14 +287,6 @@
                   mv {{LOG_DIRR}}/log1_package_list_{{DATE}} {{LOG_DIRR}}/log_package_list_{{DATE}} 
           delegate_to: localhost
 
-        - name: Show Service packages count
-          shell: echo "show packages package oper-status" | ncs_cli -C | awk '{print $3}' | grep -v ^$ | wc -l 
-          register: output
-        - debug:
-             msg: " Service packages count is {{output.stdout}}"
-        - block:
-            - shell: echo "Service packages count is {{output.stdout}}" > {{LOG_DIRR}}/log_SERVICE_PACKAGE_COUNT_{{DATE}}
-          delegate_to: localhost
         - name: Show Service packages configuration per package
           include_role:
             name: package_list
@@ -326,4 +392,12 @@
                   cat {{LOG_DIRR}}/log_DEVICE_SETTING_{{DATE}}.xml | sed -z 's/,/\n/g' > {{LOG_DIRR}}/log1_DEVICE_SETTING_{{DATE}}.xml
                   mv {{LOG_DIRR}}/log1_DEVICE_SETTING_{{DATE}}.xml {{LOG_DIRR}}/log_DEVICE_SETTING_{{DATE}}.xml
           delegate_to: localhost
-
+        - name: Print ncs.conf file
+          shell: cat /etc/ncs/ncs.conf
+          register: ncs
+          become: true
+        - name: Write results to logfile {{LOG_DIRR}}/ncs.conf
+          block:
+            - shell: |
+                 echo "{{ncs.stdout}}" > {{LOG_DIRR}}/ncs.conf
+          delegate_to: localhost
