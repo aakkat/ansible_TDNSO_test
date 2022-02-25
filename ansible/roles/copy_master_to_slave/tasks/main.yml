@@ -38,7 +38,7 @@
    - debug:
         msg: "copying packages and ncs files from {{master}} to {{secondary}}"
    - shell: |
-         sshpass -p {{PASS}} sudo scp  -o StrictHostKeyChecking=no -r /var/opt/ncs/packages/ {{USER}}@{{secondary}}:/var/opt/ncs/packages/
+         sshpass -p {{PASS}} sudo scp  -o StrictHostKeyChecking=no -r /var/opt/ncs/packages/* {{USER}}@{{secondary}}:/var/opt/ncs/packages/
          sshpass -p {{PASS}} sudo scp  -o StrictHostKeyChecking=no /etc/ncs/ncs.conf {{USER}}@{{secondary}}:/etc/ncs/
          sshpass -p {{PASS}} sudo scp   -o StrictHostKeyChecking=no /etc/ncs/ncs.crypto_keys {{USER}}@{{secondary}}:/etc/ncs/
    when: ( master|trim in ansible_host )
