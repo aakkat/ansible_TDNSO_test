@@ -144,3 +144,6 @@
           when: ( 'ncs-state ha mode none' in out8.stdout )
         when: ( 'ncs-state ha mode none' in out5.stdout )
    when: ( mode == 'enable' )       
+ - name: take latest ha state
+   include_role:
+           name: ha_state
