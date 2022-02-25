@@ -1,0 +1,19 @@
+ - name: determine NSO version
+   shell:  ncs --version
+   register: out1
+ - set_fact:
+         NSO_VERSION: "{{out1.stdout}}"
+ - debug:
+       msg: "NSO version is {{NSO_VERSION}}"
+
+ - shell: |
+       sshpass -p {{PASS}} ssh -t -o StrictHostKeyChecking=no {{USER}}@{{HOST}} 'sudo su - -c "ncs --version"'
+   register: NSO_VER
+ - set_fact:
+        NSO_VERSION1: "{{NSO_VER.stdout}}"
+
+ - debug:
+        msg: "copying files from {{ansible_host}} to {{HOST}}"
+ - shell: |
+       sshpass -p {{PASS}} sudo scp  -o StrictHostKeyChecking=no -r /opt/ncs/ncs-{{NSO_VERSION}}/packages/ {{USER}}@{{HOST}}:/opt/ncs/ncs-{{NSO_VERSION1}}/
+
