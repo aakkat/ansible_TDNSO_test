@@ -19,18 +19,25 @@
                  state: directory
             - set_fact:
                  LOG_DIRR: "{{LOG_DIR}}/logs_{{HOST}}"
+            - shell: ls {{LOG_DIRR}}/log_VERSION*
+              register: file
+            - set_fact:
+                    FILE: "{{file.stdout}}"
+            - debug:
+                  msg: " file to be update is {{FILE}}"
             - shell: |
-                  cat {{LOG_DIRR}}/log_VERSION* | grep ha-mode | awk -F"ha-mode:" '{print $2}' | awk -F"," '{print $1}'
+                  cat {{FILE}} | grep ha-mode | awk -F"ha-mode:" '{print $2}' | awk -F"," '{print $1}'
               register: out
             - set_fact:
                     ha: "{{out.stdout|trim}}"
             - debug:
                     msg: "in file it is {{ha}}"
-            - name: sed 's/{{ha}}/{{HA}}/g' {{LOG_DIRR}}/log_VERSION*
+            - name: sed 's/{{ha}}/{{HA}}/g' {{FILE}}
               shell: |
-                  sed 's/{{ha}}/{{HA}}/g' {{LOG_DIRR}}/log_VERSION* 
+                  sed 's/{{ha}}/{{HA}}/g' {{FILE}}
               register: output
             - debug:
                   msg: "{{output.stdout}}"
-            - shell: echo "{{output.stdout}}" >  {{LOG_DIRR}}/log_VERSION*
+            - shell: echo "{{output.stdout}}" >  {{FILE}}
+              become: true
          delegate_to: localhost
