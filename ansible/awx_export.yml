@@ -1,0 +1,10 @@
+---
+ - hosts: localhost
+   vars_files:
+    - setup_data.yml
+   tasks:
+      - name: Exporting templates at {{LOG_DIR}}
+        shell: |
+             awx export --conf.host http://{{AWX_HOST}}/ --conf.username {{AWX_USER}} --conf.password {{AWX_PASS}} -k -f json job_templates > job_templates.json
+        args:
+            chdir: "{{LOG_DIR}}"
