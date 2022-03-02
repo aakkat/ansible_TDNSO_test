@@ -3,6 +3,17 @@ LOG_DIR: "/tmp"
 ansible_user: nsoadmin
 CDB_DIR: /var/opt/ncs/cdb/
 
+##AWX Information
+AWX_HOST: 10.78.236.119
+AWX_USER: admin
+AWX_PASS: nsoadmin
+
+##NEW AWX instance information on which job templates needs to be imported
+NEW_AWX_HOST: 172.18.176.91
+NEW_AWX_USER: admin
+NEW_AWX_PASS: nsoadmin
+
+
 # Set this parameter to True in case to start NSO with start-with-package-reload
 start-with-package-reload: False
 # Install Ubuntu 18.04 onto virtual machine
