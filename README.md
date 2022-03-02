@@ -121,6 +121,10 @@ The AWX Collections allow Ansible Playbooks to interact with AWX(Ansible Tower).
 
 host.json standard format will be as below host.json --> { "name": "$host_IP", "description": "this is a test host added via API", "enabled": true, "instance_id": "", "variables": "ansible_connection: ssh\nansible_password: $user_password\nansible_ssh_user: $username\nhost_key_checking: False" }
 
+**AWX templates to export from existing instance, to import on new instance
+AWX login Crednetials of existing and new instance can be set in setup_data.yml before running import and export of templates playbooks.
+awx_export.yml have to be run from existing instancen with no parameters.
+awx_import.yml have to be run from existing instance with parameters as -e dest_host=new_instance_IP -e dest_user=new_instance_user -e dest_pass=new_instacne_password
 ##Contacts
 Mohit Kumar Pal <mohpal@cisco.com>
 
