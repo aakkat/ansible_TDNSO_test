@@ -2,7 +2,7 @@
          shell: |
             echo "show ncs-state ha | display json" | ncs_cli -C | grep mode | sed 's/mode/ha-mode/g' | grep ha-mode | awk -F'"ha-mode":' '{print $2}' | awk -F'"' '{print $2}'
          register: ha
-         ignore_errors: true
+         
        - debug:
               msg: "latest is {{ha.stdout}}"
        - set_fact:
