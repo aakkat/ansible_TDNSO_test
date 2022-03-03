@@ -14,6 +14,7 @@
      HOST: "{{dest_host}}"
      USER: "{{dest_user}}"
      PASS: "{{dest_pass}}"
+     package_list: "{{package_list}}"
      mode: "{{mode}}"
      device: "{{device}}"
      config: "{{config}}"
