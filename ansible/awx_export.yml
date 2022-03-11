@@ -2,6 +2,8 @@
  - hosts: localhost
    vars_files:
     - setup_data.yml
+   environment:
+        PATH: "{{ ansible_env.PATH }}:~/.local/bin"
    tasks:
       - name: Exporting templates at {{LOG_DIR}}
         shell: |
