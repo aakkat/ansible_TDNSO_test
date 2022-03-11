@@ -18,10 +18,8 @@
    environment:
         PATH: "{{ ansible_env.PATH }}:~/.local/bin"
    tasks:
-      - shell: whoami
-        register: out
-      - debug:
-             msg: "{{out.stdout}}"
+      - shell:  pip3 install awxkit
+        ignore_errors: true
       - name: importing templates from {{AWX_HOST}} at {{LOG_DIR}} on local
         shell: |         
              awx import --conf.host http://{{NEW_AWX_HOST}}/ --conf.username {{NEW_AWX_USER}} --conf.password {{NEW_AWX_PASS}} -k -f json job_templates < job_templates.json
