@@ -1,15 +1,14 @@
-- hosts: ubuntu
+- hosts: all
   gather_facts: no
   connection: local
   vars_files:
     - setup_data.yml
-    - setup_data_secure.yml
   roles:
     - { role: Ubuntu_vcenter_deploy, tags: [ 'install-vm' ] , when: VM_INSTALL }
-- hosts: ubuntu
+- hosts: all
   vars_files:
     - setup_data.yml
-    - setup_data_secure.yml
+    
   vars:
      HOST: "{{dest_host}}"
      USER: "{{dest_user}}"
