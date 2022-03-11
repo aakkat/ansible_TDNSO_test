@@ -1,11 +1,4 @@
 - hosts: all
-  gather_facts: no
-  connection: local
-  vars_files:
-    - setup_data.yml
-  roles:
-    - { role: Ubuntu_vcenter_deploy, tags: [ 'install-vm' ] , when: VM_INSTALL }
-- hosts: all
   vars_files:
     - setup_data.yml
     
