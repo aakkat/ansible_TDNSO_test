@@ -13,9 +13,9 @@
         register: out1
         become: true
       - set_fact:
-             cdb_run : "{{out1.stdout}}"
+              cdb_run : "{{out1.stdout[0:35]}}"
       - debug:
-           msg: "{{out1.stdout}}"
+              msg: "{{out1.stdout[0:35]}}"
       - name: Start NSO service
         include_role:
                name: start_NSO
