@@ -13,9 +13,9 @@
         register: out1
         become: true
       - set_fact:
-              cdb_run : "{{out1.stdout[0:35]}}"
+              cdb_run : "{{out1.stdout[0:34]}}"
       - debug:
-              msg: "{{out1.stdout[0:35]}}"
+              msg: "{{out1.stdout[0:34]}}"
       - name: Start NSO service
         include_role:
                name: start_NSO
@@ -24,6 +24,13 @@
         register: stnso
       - set_fact:
              st_nso : "{{stnso.stdout}}"
+
+      - name: Giving hostname detail
+        shell: hostname -I | cut -d' ' -f1
+        register: output
+      - set_fact:
+            HOST: "{{output.stdout}}"
+
       - name: Write results to logfile log_VERSION file
         block:
            - name: Create Directory {{LOG_DIR}}/logs_{{HOST}}
