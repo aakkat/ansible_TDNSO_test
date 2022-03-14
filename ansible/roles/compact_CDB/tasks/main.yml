@@ -12,8 +12,27 @@
         shell: "{{CMD}}"
         register: out1
         become: true
+      - set_fact:
+             cdb_run : "{{out1.stdout}}"
       - debug:
-          msg: "{{out1.stdout}}"
+           msg: "{{out1.stdout}}"
       - name: Start NSO service
-        include_role: 
+        include_role:
                name: start_NSO
+      - shell: |
+              echo "NSO service started"
+        register: stnso
+      - set_fact:
+             st_nso : "{{stnso.stdout}}"
+      - name: Write results to logfile log_VERSION file
+        block:
+           - name: Create Directory {{LOG_DIR}}/logs_{{HOST}}
+             file:
+               path: "{{LOG_DIR}}/logs_{{HOST}}"
+               state: directory
+           - set_fact:
+                 LOG_DIRR: "{{LOG_DIR}}/logs_{{HOST}}"
+           - shell: |
+                echo "CDB_RUN: {{cdb_run}}" > {{LOG_DIRR}}/log_CDB_file.json
+                echo "NSO_SERVICE: {{st_nso}}" >> {{LOG_DIRR}}/log_CDB_file.json
+        delegate_to: localhost
