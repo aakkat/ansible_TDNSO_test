@@ -2,7 +2,7 @@
           register: output
         - set_fact:
                HOST: "{{output.stdout}}"
-        - block:               
+        - block:
           - name: Create Directory {{LOG_DIR}}/logs_{{HOST}} on remote server {{ansible_hostname}}
             file:
                path: "{{LOG_DIR}}/logs_{{HOST}}"
@@ -13,9 +13,9 @@
                 msg: "Directory is {{LOG_DIRR}}"
           - shell:  rm -rf *
             args:
-                chdir: "{{LOG_DIRR}}"         
+                chdir: "{{LOG_DIRR}}"
           delegate_to: localhost
-  
+
         - name: setting date variable
           shell: date "+%F-%H-%M-%S"
           register: out
@@ -23,7 +23,7 @@
              DATE: "{{out.stdout}}"
         - debug:
              msg: "file name would be in format log_TASK_{{DATE}}.extension"
-      
+
         - name: Identify the Linux flavor, JAVA,PYTHON,NCS,ANT Version
           shell: |
              hostnamectl
@@ -102,9 +102,9 @@
             - shell: |
                     echo "{{ha.stdout}}" >> {{LOG_DIRR}}/log_VERSION_{{DATE}}.json
           delegate_to: localhost
-          
+
         - name: Show Service packages count
-          shell: echo "show packages package oper-status" | ncs_cli -C | awk '{print $3}' | grep -v ^$ | wc -l 
+          shell: echo "show packages package oper-status" | ncs_cli -C | awk '{print $3}' | grep -v ^$ | wc -l
           register: output
         - debug:
              msg: " Service packages count is {{output.stdout}}"
@@ -112,7 +112,7 @@
             - shell: |
                     echo "Service_packages_count: {{output.stdout}}" >> {{LOG_DIRR}}/log_VERSION_{{DATE}}.json
           delegate_to: localhost
-          
+
         - name: Check NSO server status,reachability
           shell:  ps -aux | grep ncs.conf
           register: output
@@ -196,7 +196,7 @@
                    dest: "{{LOG_DIRR}}/log_python_lib_{{DATE}}.txt"
              delegate_to: localhost
           when: ( 'not found' not in pip_out.stderr )
-      
+
         - name: HA configuration
           block:
           - name: determine NSO version
@@ -205,7 +205,7 @@
           - shell: echo "{{out1.stdout}}" | cut -c1-3
             register: out2
           - set_fact:
-               NSO_VER: "{{out2.stdout|float}}" 
+               NSO_VER: "{{out2.stdout|float}}"
           - debug:
                msg: "version is {{NSO_VER}}"
           - set_fact:
@@ -284,7 +284,7 @@
             - name: Data Modification
               shell: |
                   cat {{LOG_DIRR}}/log_package_list_{{DATE}} | sed -z 's/,/\n/g' > {{LOG_DIRR}}/log1_package_list_{{DATE}}
-                  mv {{LOG_DIRR}}/log1_package_list_{{DATE}} {{LOG_DIRR}}/log_package_list_{{DATE}} 
+                  mv {{LOG_DIRR}}/log1_package_list_{{DATE}} {{LOG_DIRR}}/log_package_list_{{DATE}}
           delegate_to: localhost
 
         - name: Show Service packages configuration per package
@@ -322,6 +322,16 @@
                   cat {{LOG_DIRR}}/log_NED_list_{{DATE}}.xml | sed -z 's/,/\n/g' > {{LOG_DIRR}}/log1_NED_list_{{DATE}}.xml
                   mv {{LOG_DIRR}}/log1_NED_list_{{DATE}}.xml {{LOG_DIRR}}/log_NED_list_{{DATE}}.xml
           delegate_to: localhost
+        - name: Show NED List JSON format
+          shell:  echo "show devices ned-ids ned-id | display json" | ncs_cli -C
+          register: outputjs1
+          ignore_errors: true
+        - debug:
+              msg: "{{outputjs1.stdout_lines}}"
+        - block:
+            - shell: echo "{{outputjs1.stdout}}" > {{LOG_DIRR}}/log_NED_list_{{DATE}}.json
+          delegate_to: localhost
+
 
         - name: Show NED Settings
           shell:  echo "show running-config devices device ned-settings | display xml" | ncs_cli -C
@@ -377,6 +387,15 @@
               shell: |
                   cat {{LOG_DIRR}}/log_DEVICE_GROUP_{{DATE}}.xml | sed -z 's/,/\n/g' > {{LOG_DIRR}}/log1_DEVICE_GROUP_{{DATE}}.xml
                   mv {{LOG_DIRR}}/log1_DEVICE_GROUP_{{DATE}}.xml {{LOG_DIRR}}/log_DEVICE_GROUP_{{DATE}}.xml
+          delegate_to: localhost
+        - name: Show Device Group json
+          shell: echo "show devices device-group | display json" | ncs_cli -C
+          register: outputjs
+          ignore_errors: true
+        - debug:
+              msg: "{{outputjs.stdout_lines}}"
+        - block:
+            - shell: echo "{{outputjs.stdout}}" > {{LOG_DIRR}}/log_DEVICE_GROUP_{{DATE}}.json
           delegate_to: localhost
 
         - name: Show Device Global Setting
