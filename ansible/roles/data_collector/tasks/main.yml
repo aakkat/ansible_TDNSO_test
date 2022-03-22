@@ -330,8 +330,11 @@
               msg: "{{outputjs1.stdout_lines}}"
         - block:
             - shell: echo "{{outputjs1.stdout}}" > {{LOG_DIRR}}/log_NED_list_{{DATE}}.json
+            - name: modify devicegroup json file
+              shell: |
+                cat {{LOG_DIRR}}/log_NED_list_{{DATE}}.json | grep -i "id"| egrep  "\-[0-9]+\.[0-9]+" | awk -F":" '{print $2}' |awk '{$1=$1};1' > {{LOG_DIRR}}/log1_NED_list_{{DATE}}.json
+                mv {{LOG_DIRR}}/log1_NED_list_{{DATE}}.json {{LOG_DIRR}}/log_NED_list_{{DATE}}.json
           delegate_to: localhost
-
 
         - name: Show NED Settings
           shell:  echo "show running-config devices device ned-settings | display xml" | ncs_cli -C
@@ -393,9 +396,14 @@
           register: outputjs
           ignore_errors: true
         - debug:
-              msg: "{{outputjs.stdout_lines}}"
-        - block:
+              msg: "{{outputjs.stdout}}"
+        - name: modify devicegroup json file
+          block:
             - shell: echo "{{outputjs.stdout}}" > {{LOG_DIRR}}/log_DEVICE_GROUP_{{DATE}}.json
+            - name: modify devicegroup json file
+              shell: |
+                cat {{LOG_DIRR}}/log_DEVICE_GROUP_{{DATE}}.json |grep "name" |awk -F"," '{print $1}'|awk -F":" '{print $2}'|awk '{$1=$1};1' > {{LOG_DIRR}}/log1_DEVICE_GROUP_{{DATE}}.json
+                mv {{LOG_DIRR}}/log1_DEVICE_GROUP_{{DATE}}.json {{LOG_DIRR}}/log_DEVICE_GROUP_{{DATE}}.json
           delegate_to: localhost
 
         - name: Show Device Global Setting
@@ -419,4 +427,14 @@
           block:
             - shell: |
                  echo "{{ncs.stdout}}" > {{LOG_DIRR}}/ncs.conf
+          delegate_to: localhost
+        - name: show device brief
+          shell: echo "show devices brief" | ncs_cli -C
+          register: output
+        - debug:
+             msg: "{{output.stdout}}"
+          delegate_to: localhost
+        - name: Write results to logfile {{LOG_DIRR}}/log_devices_brief_Output_{{DATE}}
+          block:
+            - shell: echo "{{output.stdout}}" > {{LOG_DIRR}}/log_devices_brief_Output_{{DATE}}.json
           delegate_to: localhost
