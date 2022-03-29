@@ -1,6 +1,44 @@
 
-  - name: List the device groups 
-    shell:  echo "show devices device-group member" | ncs_cli -C | awk -F'[][]' '{print $2}' | uniq | awk NF
+  - shell: hostname -I | cut -d' ' -f1
+    register: output
+  - set_fact:
+       HOST: "{{output.stdout}}"
+  - block:
+     - name: Create Directory {{LOG_DIR}}/logs_{{HOST}} on remote server {{ansible_hostname}}
+       file:
+         path: "{{LOG_DIR}}/logs_{{HOST}}"
+         state: directory
+     - set_fact:
+           LOG_DIRR: "{{LOG_DIR}}/logs_{{HOST}}"
+     - debug:
+           msg: "Directory is {{LOG_DIRR}}"
+
+  - name: setting date variable
+    shell: date "+%F-%H-%M-%S"
+    register: out
+  - set_fact:
+        DATE: "{{out.stdout}}"
+  - debug:
+        msg: "file name would be in format log_TASK_{{DATE}}.extension"
+
+  - name: device group detail
+    block:
+      - shell: |
+            ls -lrt {{LOG_DIRR}} |grep -i "DEVICE_GROUP" |grep -i "json" |awk -F" " '{print $9}'
+        register: outdev
+      - debug:
+          msg: "{{outdev.stdout}}"
+      - shell: |
+            cat {{LOG_DIRR}}/"{{outdev.stdout}}"
+        register: outgrp
+      - set_fact:
+            name: "{{outgrp.stdout}}"
+      - debug:
+            msg: "{{outgrp.stdout}}"
+    delegate_to: localhost
+
+  - name: List the device groups
+    shell:  echo "show devices device-group {{name}} member" | ncs_cli -C | awk -F'[][]' '{print $2}' | uniq | awk NF
     register: out1
 
   - shell: echo "{{NEW_NEDs}}"
@@ -15,4 +53,15 @@
     with_nested:
           - "{{out1.stdout_lines}}"
           - "{{out2.stdout_lines}}"
+
+  - name: Device migration
+    block:
+      - shell: echo "{{OLD_NEDs}}"
+        register: out3
+
+      - shell: |
+           echo "devices migrate old-ned-id {{out3.stdout}} new-ned-id {{out2.stdout}}" | ncs_cli -C;
+        register: out4
+      - debug:
+           msg: "{{out4.stdout}}"
 
