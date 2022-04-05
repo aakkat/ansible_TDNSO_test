@@ -1,4 +1,3 @@
-
   - shell: hostname -I | cut -d' ' -f1
     register: output
   - set_fact:
@@ -12,6 +11,7 @@
            LOG_DIRR: "{{LOG_DIR}}/logs_{{HOST}}"
      - debug:
            msg: "Directory is {{LOG_DIRR}}"
+    delegate_to: localhost
 
   - name: setting date variable
     shell: date "+%F-%H-%M-%S"
@@ -43,25 +43,70 @@
 
   - shell: echo "{{NEW_NEDs}}"
     register: out2
+  - shell: echo "{{OLD_NEDs}}"
+    register: out3
+
+  - name: Removing any existing log file
+    find:
+      paths: "{{LOG_DIRR}}"
+      patterns: log_DEVICE_MIGRATION_*.json
+    register: files_to_delete
+    delegate_to: localhost
+
+  - name: Ansible remove file glob
+    file:
+      path: "{{ item.path }}"
+      state: absent
+    with_items: "{{ files_to_delete.files }}"
+    delegate_to: localhost
 
   - name: run migrate command
-    shell: |
-        for i in {{item[0]}};
-        do
-          echo "devices device $i migrate new-ned-id {{item[1]}} no-networking wait-for-lock { infinity }" | ncs_cli -C;
-        done;
-    with_nested:
-          - "{{out1.stdout_lines}}"
-          - "{{out2.stdout_lines}}"
+    block:
+      - name: Creating Dev mig log file
+        file:
+          path: "{{LOG_DIRR}}/log_DEVICE_MIGRATION_{{DATE}}.json"
+          state: touch
+      - name: Execute a loop for device list
+        shell: |
+           for i in {{item[0]}} ; do echo "devices device $i migrate new-ned-id {{item[1]}} no-networking wait-for-lock { infinity }" | ncs_cli -C; done
+        register: test
+        with_nested:
+             - "{{out1.stdout_lines}}"
+             - "{{out2.stdout_lines}}"
+      - set_fact:
+           stdout_lines: []
+      - set_fact:
+           stdout_lines: "{{ stdout_lines + out1.stdout_lines + item.stdout_lines }}"
+        with_items: "{{ test.results }}"
+      - debug:
+           msg: "{{item}}"
+        with_items: "{{stdout_lines}}"
+      - set_fact:
+           lpdvlst: "{{stdout_lines}}"
+    become: true
 
   - name: Device migration
     block:
-      - shell: echo "{{OLD_NEDs}}"
-        register: out3
-
       - shell: |
-           echo "devices migrate old-ned-id {{out3.stdout}} new-ned-id {{out2.stdout}}" | ncs_cli -C;
+           echo "devices migrate old-ned-id {{out3.stdout}} new-ned-id {{out2.stdout}}" | ncs_cli -C
         register: out4
       - debug:
            msg: "{{out4.stdout}}"
+      - set_fact:
+           dev_mig: "{{out4.stdout}}"
+    when: ( out3.stdout ) is defined and ( out3.stdout ) != ''
 
+  - name: Writing logs to a file
+    block:
+      - name: Create Directory {{LOG_DIR}}/logs_{{HOST}}
+        file:
+          path: "{{LOG_DIR}}/logs_{{HOST}}"
+          state: directory
+      - set_fact:
+            LOG_DIRR: "{{LOG_DIR}}/logs_{{HOST}}"
+      - shell: |
+           echo "Device list: {{lpdvlst}}" >> {{LOG_DIRR}}/log_DEVICE_MIGRATION_{{DATE}}.json
+      - shell: |
+           echo "Device migrate: {{dev_mig}}" >> {{LOG_DIRR}}/log_DEVICE_MIGRATION_{{DATE}}.json
+        when: ( out3.stdout ) is defined and ( out3.stdout ) != ''
+    delegate_to: localhost
