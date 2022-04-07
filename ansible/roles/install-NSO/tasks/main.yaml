@@ -49,7 +49,7 @@
 
 - name: Copy NSO install file (Local copy)
   copy:
-    src: "/var/lib/awx/projects/*ansoble/ansible/files/{{ nso_installer_name }}" 
+    src: "{{ NSOImageLocation }}" 
     dest: /tmp/NSO.bin
     mode: '740'
   when: NSOCopyType == 'local' and ncs_current_dir.stat.exists == False
