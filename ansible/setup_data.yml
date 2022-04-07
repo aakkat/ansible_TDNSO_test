@@ -62,6 +62,7 @@ DfltAuthPass: admin
 # nso_install_dir: NSO_FILES
 # nso_run_dir: ncs-run
 #nso_installer_name: nso-4.7.9.linux.x86_64.signed.bin
+nso_installer_name: nso-5.7.2.1.linux.x86_64.signed.bin
 # nso_java_opts: -Xmx2G -Xms1G
 # nso_package_list: 
 #     - ncs-5.4.4-cisco-ios-6.74.5.signed.bin
