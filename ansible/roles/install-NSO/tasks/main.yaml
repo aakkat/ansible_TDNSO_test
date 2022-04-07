@@ -121,20 +121,25 @@
   ansible.builtin.file:
     path: "{{filename.dest}}"
     state: absent
+ 
+- name: create symbolic link
+  file:
+    src: /opt/ncs/ncs-5.7.2.1
+    dest: /opt/ncs/current
+    state: link
+  become: true
 
 - name: Start NSO service
   shell: |
-    source /etc/profile.d/ncs.sh
-    /etc/init.d/ncs start >> /tmp/aNSOble.log 2>&1
+    source /etc/profile.d/ncs.sh;/etc/init.d/ncs start >> /tmp/aNSOble.log 2>&1
   become: true
-  when: ncs_current_dir.stat.exists == "False" and start-with-package-reload == "False"
+ # when: ncs_current_dir.stat.exists == "False" and start-with-package-reload == "False"
 
 - name: Start NSO service with package-reload
   shell: |
-    source /etc/profile.d/ncs.sh
-    /etc/init.d/ncs start --with-package-reload >> /tmp/aNSOble.log 2>&1
+    source /etc/profile.d/ncs.sh;/etc/init.d/ncs start --with-package-reload >> /tmp/aNSOble.log 2>&1
   become: true
-  when: ncs_current_dir.stat.exists == "False" and start-with-package-reload == "True"
+ # when: ncs_current_dir.stat.exists == "False" and start-with-package-reload == "True"
 
 - name: Creating the default authgroup file from template
   template:
