@@ -52,10 +52,8 @@
     src: "{{ NSOImageLocation }}" 
     dest: /tmp/NSO.bin
     mode: '740'
-    remote_src: yes
   when: NSOCopyType == 'local' and ncs_current_dir.stat.exists == False
   become: yes
-  delegate_to: localhost
 
 - name: Unpack NSO install file
   shell: sh /tmp/NSO.bin >> /tmp/aNSOble.log 2>&1
