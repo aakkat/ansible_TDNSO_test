@@ -49,18 +49,13 @@
 
 - name: Copy NSO install file (Local copy)
   copy:
-    src: "{{ NSOImageLocation }}" 
-    dest: /tmp/NSO.bin
-    mode: '740'
-  when: NSOCopyType == 'local' and ncs_current_dir.stat.exists == False
-  become: yes
+    src: /var/lib/awx/projects/nso-5.7.2.1.linux.x86_64.signed.bin
+    dest: /home/ciscoadmin/rdirectory/nso-5.7.2.1.linux.x86_64.signed.bin
+    mode: '0777'
 
 - name: Unpack NSO install file
-  shell: sh /tmp/NSO.bin >> /tmp/aNSOble.log 2>&1
-  args:
-    chdir: /tmp/
-  when: ncs_current_dir.stat.exists == False
-  become: yes
+  command:
+     cmd: "sh /home/ciscoadmin/rdirectory/nso-5.7.2.1.linux.x86_64.signed.bin"
 
 - name: Perfom NSO system install
   shell: eval "/tmp/$(sed -e s/\ /\\n/g aNSOble.log | grep bin | tail -1) --system-install --non-interactive" >> /tmp/aNSOble.log 2>&1
