@@ -49,13 +49,18 @@
 
 - name: Copy NSO install file (Local copy)
   copy:
-    src: "{{ NSOImageLocation }}"
+    src: "{{ NSOImageLocation }}" 
     dest: /tmp/NSO.bin
-    mode: '0777'
+    mode: '740'
+  when: NSOCopyType == 'local' and ncs_current_dir.stat.exists == False
+  become: yes
 
 - name: Unpack NSO install file
-  command:
-     cmd: "sh /tmp/NSO.bin"
+  shell: sh /tmp/NSO.bin >> /tmp/aNSOble.log 2>&1
+  args:
+    chdir: /tmp/
+  when: ncs_current_dir.stat.exists == False
+  become: yes
 
 - name: Perfom NSO system install
   shell: eval "/tmp/$(sed -e s/\ /\\n/g aNSOble.log | grep bin | tail -1) --system-install --non-interactive" >> /tmp/aNSOble.log 2>&1
