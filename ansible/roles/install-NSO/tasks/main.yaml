@@ -34,19 +34,6 @@
   when: ncsoperUsers is defined
   loop: " {{ ncsoperUsers }} "
 
-- name: remove symlink
-  file:
-    path: "{{link_path}}"
-    state: absent
-  when: link.stat.islnk is defined and link.stat.islnk
-  become: true
-
-- name: Check if NSO is already installed
-  stat:
-    path: /opt/ncs/current/
-  become: true
-  register: ncs_current_dir
-
 - name: Check if NSO is already installed
   stat:
     path: /opt/ncs/current/
