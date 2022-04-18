@@ -34,7 +34,7 @@ NSOCopyType: local
 #URL/path (Depending on the NSOCopyType) from which the NSO install file should be downloaded
 #NSOImageLocation: http://www.ovh.net/files/1Mio.dat 
 #NSOImageLocation: '{{ playbook_dir }}/files/{{ nso_installer_name }}'
-NSOImageLocation: '/var/lib/awx/projects/files/{{ nso_installer_name }}'
+NSOImageLocation: '/var/lib/awx/projects/{{ nso_installer_name }}'
 
 #Type of copy for the NED install files, can be local or remote
 #NEDCopyType: remote
