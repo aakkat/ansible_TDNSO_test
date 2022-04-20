@@ -1,0 +1,9 @@
+---
+# tasks file for copy_patch
+- name: copy config
+  include_role:
+       name: config_NSO
+
+- name: run data collector
+  include_role:
+       name: data_collector
