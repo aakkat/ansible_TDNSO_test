@@ -1,11 +1,66 @@
+- shell: hostname -I | cut -d' ' -f1
+  register: output
+- set_fact:
+     HOST: "{{output.stdout}}"
+- block:
+   - name: Create Directory {{LOG_DIR}}/logs_{{HOST}} on remote server {{ansible_hostname}}
+     file:
+       path: "{{LOG_DIR}}/logs_{{HOST}}"
+       state: directory
+   - set_fact:
+         LOG_DIRR: "{{LOG_DIR}}/logs_{{HOST}}"
+   - debug:
+         msg: "Directory is {{LOG_DIRR}}"
+  delegate_to: localhost
 
-  - name: feed input payload to config file  
-    copy:
-      dest: ~/config.xml
-      content: "{{config}}"
-  - name: Load default authgroup
-    shell: ncs_load -l -m ~/config.xml >> /tmp/aNSOble.log 2>&1
-    environment:
-       PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
-    become: true
+- name: setting date variable
+  shell: date "+%F-%H-%M-%S"
+  register: out
+- set_fact:
+      DATE: "{{out.stdout}}"
+- debug:
+     msg: "file name would be in format log_TASK_{{DATE}}.extension"
 
+- name: Removing any existing log file
+  find:
+    paths: "{{LOG_DIRR}}"
+    patterns: log_configNSO_*.json
+  register: files_to_delete
+  delegate_to: localhost
+
+- name: Ansible remove file glob
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ files_to_delete.files }}"
+  delegate_to: localhost
+
+- name: Executing ncs block
+  block:
+     - name: feed input payload to config file
+       copy:
+         content: "{{ lookup('file', '~/config.xml') }}"
+         dest: ~/config.xml
+       become: true
+     - name: Load default authgroup
+       shell: ncs_load -l -m ~/config.xml >> /tmp/aNSOble.log 2>&1
+       environment:
+           PATH: /opt/ncs/current/bin:{{ ansible_env.PATH }}
+       become: true
+       register: authfile
+     - debug: msg="ncs load{{':'}} Successful"
+       when: authfile.rc == 0
+     - name: creating a file during success
+       shell: |
+            echo "ncs load: Successful" > "{{LOG_DIRR}}/log_configNSO_{{DATE}}.json"
+       when: authfile.rc == 0
+       delegate_to: localhost
+
+  rescue:
+     - debug: msg="ncs load{{':'}} Failed"
+       when: authfile.rc != 0
+     - name: creating a file during failure
+       shell: |
+           echo "ncs load: Failed" > "{{LOG_DIRR}}/log_configNSO_{{DATE}}.json"
+       when: authfile.rc != 0
+       delegate_to: localhost
