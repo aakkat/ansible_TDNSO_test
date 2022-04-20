@@ -30,3 +30,4 @@
     - { role: copy_master_to_slave, tags: [ 'copy_master_to_slave' ] }
     - { role: copy_ncs_files, tags: [ 'copy_ncs_files' ] }
     - { role: copy_packages, tags: [ 'copy_packages' ] }
+    - { role: copy_patch, tags: [ 'copy_patch' ] }
